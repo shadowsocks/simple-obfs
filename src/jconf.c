@@ -170,31 +170,12 @@ read_jconf(const char *file)
                     conf.remote_addr[0].port = NULL;
                     conf.remote_num          = 1;
                 }
-            } else if (strcmp(name, "port_password") == 0) {
-                if (value->type == json_object) {
-                    for (j = 0; j < value->u.object.length; j++) {
-                        if (j >= MAX_PORT_NUM) {
-                            break;
-                        }
-                        json_value *v = value->u.object.values[j].value;
-                        if (v->type == json_string) {
-                            conf.port_password[j].port = ss_strndup(value->u.object.values[j].name,
-                                                                    value->u.object.values[j].name_length);
-                            conf.port_password[j].password = to_string(v);
-                            conf.port_password_num         = j + 1;
-                        }
-                    }
-                }
             } else if (strcmp(name, "server_port") == 0) {
                 conf.remote_port = to_string(value);
             } else if (strcmp(name, "local_address") == 0) {
                 conf.local_addr = to_string(value);
             } else if (strcmp(name, "local_port") == 0) {
                 conf.local_port = to_string(value);
-            } else if (strcmp(name, "password") == 0) {
-                conf.password = to_string(value);
-            } else if (strcmp(name, "method") == 0) {
-                conf.method = to_string(value);
             } else if (strcmp(name, "timeout") == 0) {
                 conf.timeout = to_string(value);
             } else if (strcmp(name, "user") == 0) {
@@ -207,35 +188,14 @@ read_jconf(const char *file)
                 check_json_value_type(value, json_boolean,
                         "invalid config file: option 'fast_open' must be a boolean");
                 conf.fast_open = value->u.boolean;
-            } else if (strcmp(name, "auth") == 0) {
-                check_json_value_type(value, json_boolean,
-                        "invalid config file: option 'auth' must be a boolean");
-                conf.auth = value->u.boolean;
             } else if (strcmp(name, "nofile") == 0) {
                 check_json_value_type(value, json_integer,
                     "invalid config file: option 'nofile' must be an integer");
                 conf.nofile = value->u.integer;
             } else if (strcmp(name, "nameserver") == 0) {
                 conf.nameserver = to_string(value);
-            } else if (strcmp(name, "tunnel_address") == 0) {
-                conf.tunnel_address = to_string(value);
-            } else if (strcmp(name, "mode") == 0) {
-                char *mode_str = to_string(value);
-
-                if (strcmp(mode_str, "tcp_only") == 0)
-                    conf.mode = TCP_ONLY;
-                else if (strcmp(mode_str, "tcp_and_udp") == 0)
-                    conf.mode = TCP_AND_UDP;
-                else if (strcmp(mode_str, "udp_only") == 0)
-                    conf.mode = UDP_ONLY;
-                else
-                    LOGI("ignore unknown mode: %s, use tcp_only as fallback",
-                         mode_str);
-                ss_free(mode_str);
-            } else if (strcmp(name, "mtu") == 0) {
-                check_json_value_type(value, json_integer,
-                    "invalid config file: option 'mtu' must be an integer");
-                conf.mtu = value->u.integer;
+            } else if (strcmp(name, "dst_addr") == 0) {
+                conf.dst_addr = to_string(value);
             } else if (strcmp(name, "mptcp") == 0) {
                 check_json_value_type(value, json_boolean,
                     "invalid config file: option 'mptcp' must be a boolean");

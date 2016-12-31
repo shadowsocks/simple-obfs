@@ -1197,6 +1197,9 @@ main(int argc, char **argv)
         if (user == NULL) {
             user = conf->user;
         }
+        if (dst_addr_str == NULL) {
+            dst_addr_str = conf->dst_addr;
+        }
         if (obfs_para == NULL && conf->obfs != NULL) {
             if (strcmp(conf->obfs, obfs_http->name) == 0)
                 obfs_para = obfs_http;

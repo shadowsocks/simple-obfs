@@ -30,10 +30,6 @@
 #define MAX_REQUEST_TIMEOUT 60
 #define MIN_UDP_TIMEOUT 10
 
-#define TCP_ONLY     0
-#define TCP_AND_UDP  1
-#define UDP_ONLY     3
-
 typedef struct {
     char *host;
     char *port;
@@ -47,24 +43,17 @@ typedef struct {
 typedef struct {
     int remote_num;
     ss_addr_t remote_addr[MAX_REMOTE_NUM];
-    int port_password_num;
-    ss_port_password_t port_password[MAX_PORT_NUM];
     char *remote_port;
     char *local_addr;
     char *local_port;
-    char *password;
-    char *method;
     char *timeout;
     char *user;
     char *obfs;
     char *obfs_host;
-    int auth;
     int fast_open;
     int nofile;
     char *nameserver;
-    char *tunnel_address;
-    int mode;
-    int mtu;
+    char *dst_addr;
     int mptcp;
     int ipv6_first;
 } jconf_t;

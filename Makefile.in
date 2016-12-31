@@ -163,7 +163,7 @@ am__define_uniq_tagged_files = \
 ETAGS = etags
 CTAGS = ctags
 CSCOPE = cscope
-DIST_SUBDIRS = libsodium libcork libipset libudns libev src doc
+DIST_SUBDIRS = libsodium libcork libudns libev src doc
 am__DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/config.h.in \
 	$(top_srcdir)/auto/ar-lib $(top_srcdir)/auto/compile \
 	$(top_srcdir)/auto/config.guess $(top_srcdir)/auto/config.sub \
@@ -339,10 +339,9 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-@USE_SYSTEM_SHARED_LIB_FALSE@SUBDIRS = libsodium libcork libipset \
-@USE_SYSTEM_SHARED_LIB_FALSE@	libudns libev src $(am__append_1)
-@USE_SYSTEM_SHARED_LIB_TRUE@SUBDIRS = libcork libipset src \
-@USE_SYSTEM_SHARED_LIB_TRUE@	$(am__append_1)
+@USE_SYSTEM_SHARED_LIB_FALSE@SUBDIRS = libsodium libcork libudns libev \
+@USE_SYSTEM_SHARED_LIB_FALSE@	src $(am__append_1)
+@USE_SYSTEM_SHARED_LIB_TRUE@SUBDIRS = libcork src $(am__append_1)
 ACLOCAL_AMFLAGS = -I m4
 all: config.h
 	$(MAKE) $(AM_MAKEFLAGS) all-recursive

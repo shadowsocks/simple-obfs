@@ -298,7 +298,6 @@ AM_COND_IF([USE_SYSTEM_SHARED_LIB],[
 
 AC_CONFIG_FILES([Makefile
                  libcork/Makefile
-                 libipset/Makefile
                  src/Makefile])
 AM_COND_IF([USE_SYSTEM_SHARED_LIB],[
     AC_CHECK_LIB([udns], [dns_dnlen], ,[AC_MSG_ERROR([Couldn't find libudns. Try installing libudns-dev or udns-devel.])])

@@ -15768,7 +15768,7 @@ else
 
 fi
 
-ac_config_files="$ac_config_files Makefile libcork/Makefile libipset/Makefile src/Makefile"
+ac_config_files="$ac_config_files Makefile libcork/Makefile src/Makefile"
 
 if test -z "$USE_SYSTEM_SHARED_LIB_TRUE"; then :
 
@@ -16916,7 +16916,6 @@ do
     "libtool") CONFIG_COMMANDS="$CONFIG_COMMANDS libtool" ;;
     "Makefile") CONFIG_FILES="$CONFIG_FILES Makefile" ;;
     "libcork/Makefile") CONFIG_FILES="$CONFIG_FILES libcork/Makefile" ;;
-    "libipset/Makefile") CONFIG_FILES="$CONFIG_FILES libipset/Makefile" ;;
     "src/Makefile") CONFIG_FILES="$CONFIG_FILES src/Makefile" ;;
     "libudns/Makefile") CONFIG_FILES="$CONFIG_FILES libudns/Makefile" ;;
     "libev/Makefile") CONFIG_FILES="$CONFIG_FILES libev/Makefile" ;;

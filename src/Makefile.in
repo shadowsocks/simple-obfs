@@ -132,9 +132,8 @@ am_obfs_local_OBJECTS = obfs_local-utils.$(OBJEXT) \
 	obfs_local-local.$(OBJEXT) $(am__objects_1) $(am__objects_2)
 obfs_local_OBJECTS = $(am_obfs_local_OBJECTS)
 am__DEPENDENCIES_1 =
-am__DEPENDENCIES_2 = $(top_builddir)/libipset/libipset.la \
-	$(top_builddir)/libcork/libcork.la $(am__DEPENDENCIES_1) \
-	$(am__DEPENDENCIES_1) $(am__append_3)
+am__DEPENDENCIES_2 = $(top_builddir)/libcork/libcork.la \
+	$(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1) $(am__append_3)
 obfs_local_DEPENDENCIES = $(am__DEPENDENCIES_2) $(am__DEPENDENCIES_1) \
 	$(am__append_7)
 AM_V_lt = $(am__v_lt_@AM_V@)
@@ -349,10 +348,8 @@ VERSION_INFO = 2:0:0
 AM_CFLAGS = -g -O2 -Wall -Werror -Wno-deprecated-declarations \
 	-fno-strict-aliasing -std=gnu99 -D_GNU_SOURCE \
 	$(PTHREAD_CFLAGS) $(am__append_1) \
-	-I$(top_srcdir)/libipset/include \
 	-I$(top_srcdir)/libcork/include $(LIBPCRE_CFLAGS)
-OBFS_COMMON_LIBS = $(top_builddir)/libipset/libipset.la \
-	$(top_builddir)/libcork/libcork.la $(INET_NTOP_LIB) \
+OBFS_COMMON_LIBS = $(top_builddir)/libcork/libcork.la $(INET_NTOP_LIB) \
 	$(LIBPCRE_LIBS) $(am__append_2) $(am__append_3)
 obfs_src = obfs_http.c \
 		   obfs_tls.c \

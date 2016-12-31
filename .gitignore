@@ -13,8 +13,7 @@ config.log
 config.status
 libtool
 pid
-src/ss-*
-!src/ss-nat
+src/obfs-*
 stamp-h1
 .libs
 .pc

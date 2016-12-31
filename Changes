@@ -1,0 +1,5 @@
+simple-obfs (0.0.1-1) unstable; urgency=medium
+
+  * Add HTTP/TLS obfuscating.
+
+ -- Max Lv <max.c.lv@gmail.com>  Sat, 31 Dec 2016 18:37:12 +0800

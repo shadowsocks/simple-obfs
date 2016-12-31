@@ -3,7 +3,7 @@ obfs-local(1)
 
 NAME
 ----
-obfs-local - obfs-simple client
+obfs-local - simple-obfs client
 
 SYNOPSIS
 --------
@@ -66,15 +66,6 @@ This option is useful to control traffic in multi-interface environment.
 -b <local_address>::
 Specify local address to bind.
 
--u::
-Enable UDP relay.
-
--U::
-Enable UDP relay and disable TCP relay.
-
--A::
-Enable onetime authentication.
-
 -6::
 Resovle hostname to IPv6 address first.
 
@@ -82,12 +73,6 @@ Resovle hostname to IPv6 address first.
 Enable TCP fast open.
 +
 Only available with Linux kernel > 3.7.0.
-
---acl <acl_config>::
-Enable ACL (Access Control List) and specify config file.
-
---mtu <MTU>::
-Specify the MTU of your network interface.
 
 --mptcp::
 Enable Multipath TCP.
@@ -99,7 +84,6 @@ Enable HTTP or TLS obfuscating. (Experimental)
 
 --obfs-host <hostname>::
 Specify the hostname for obfuscating. (Experimental)
-
 
 -v::
 Enable verbose mode.
@@ -119,5 +103,4 @@ obfs-local -s example.com -p 12345 -l 1080 --obfs http --obfs-host www.baidu.com
 SEE ALSO
 --------
 `obfs-server`(1),
-/etc/obfs-simple/config.json
-
+/etc/simple-obfs/config.json

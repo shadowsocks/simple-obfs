@@ -3,7 +3,7 @@ obfs-server(1)
 
 NAME
 ----
-obfs-server - obfs-simple server
+obfs-server - simple-obfs server
 
 SYNOPSIS
 --------
@@ -108,5 +108,4 @@ obfs-server -c /etc/simple-obfs/config.json
 SEE ALSO
 --------
 `obfs-local`(1),
-`simple-obfs`(8),
 /etc/simple-obfs/config.json

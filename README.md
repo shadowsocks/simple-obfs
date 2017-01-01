@@ -25,6 +25,22 @@ sudo make install
 For a detailed and complete list of all supported arguments, you may refer to the
 man pages of the applications, respectively.
 
+### Example
+
+On the client:
+
+```bash
+obfs-local -s server_ip -p 8139 -l 1984 --obfs http --obfs-host www.baidu.com
+ss-local -c config.json -s 127.0.0.1 -p 1984 -l 1080
+```
+
+On the server:
+
+```bash
+obfs-server -s server_ip -p 8139 --obfs http -r 127.0.0.1:8388
+ss-server -c config.json -s 127.0.0.1 -p 8388
+```
+
 ## License
 
 Copyright (C) 2016 Max Lv <max.c.lv@gmail.com>

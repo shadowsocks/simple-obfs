@@ -315,6 +315,7 @@ usage()
     printf(
         "       [-h, --help]               Print this message.\n");
     printf("\n");
+    fflush(stdout);
 }
 
 void
@@ -394,5 +395,4 @@ set_nofile(int nofile)
 
     return 0;
 }
-
 #endif

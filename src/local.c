@@ -149,7 +149,7 @@ create_and_bind(const char *addr, const char *port)
 
     s = getaddrinfo(addr, port, &hints, &result);
     if (s != 0) {
-        LOGI("getaddrinfo: %s", gai_strerror(s));
+        LOGE("getaddrinfo (%s:%s), error %s", addr, port, gai_strerror(s));
         return -1;
     }
 
@@ -872,6 +872,33 @@ main(int argc, char **argv)
     int remote_num = 0;
     ss_addr_t remote_addr[MAX_REMOTE_NUM];
     char *remote_port = NULL;
+
+    char *ss_remote_host = getenv("SS_REMOTE_HOST");
+    char *ss_remote_port = getenv("SS_REMOTE_PORT");
+    char *ss_local_host  = getenv("SS_LOCAL_HOST");
+    char *ss_local_port  = getenv("SS_LOCAL_PORT");
+
+    if (ss_remote_host != NULL) {
+        ss_remote_host = strdup(ss_remote_host);
+        char *delim = "|";
+        char *p = strtok(ss_remote_host, delim);
+        do {
+            remote_addr[remote_num++].host = p;
+        } while ((p = strtok(NULL, delim)));
+    }
+
+    if (ss_remote_port != NULL) {
+        remote_port = ss_remote_port;
+    }
+
+    if (ss_local_host != NULL) {
+        local_addr = ss_local_host;
+    }
+
+    if (ss_local_port != NULL) {
+        local_port = ss_local_port;
+    }
+
 
     int option_index = 0;
 

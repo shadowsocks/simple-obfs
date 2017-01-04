@@ -1079,6 +1079,32 @@ main(int argc, char **argv)
     ss_addr_t dst_addr = { .host = NULL, .port = NULL };
     char *dst_addr_str = NULL;
 
+    char *ss_remote_host = getenv("SS_REMOTE_HOST");
+    char *ss_remote_port = getenv("SS_REMOTE_PORT");
+    char *ss_local_host  = getenv("SS_LOCAL_HOST");
+    char *ss_local_port  = getenv("SS_LOCAL_PORT");
+
+    if (ss_remote_host != NULL) {
+        ss_remote_host = strdup(ss_remote_host);
+        char *delim = "|";
+        char *p = strtok(ss_remote_host, delim);
+        do {
+            server_host[server_num++] = p;
+        } while ((p = strtok(NULL, delim)));
+    }
+
+    if (ss_remote_port != NULL) {
+        server_port = ss_remote_port;
+    }
+
+    if (ss_local_host != NULL) {
+        dst_addr.host = ss_local_host;
+    }
+
+    if (ss_local_port != NULL) {
+        dst_addr.port =  ss_local_port;
+    }
+
     int option_index                    = 0;
     static struct option long_options[] = {
         { "fast-open",       no_argument,       0, 0 },
@@ -1231,16 +1257,18 @@ main(int argc, char **argv)
         server_host[server_num++] = NULL;
     }
 
-    if (server_num == 0 || server_port == NULL || dst_addr_str == NULL) {
+    if (server_num == 0 || server_port == NULL) {
         usage();
         exit(EXIT_FAILURE);
     }
 
-    // parse dst addr
-    parse_addr(dst_addr_str, &dst_addr);
+    if (dst_addr_str != NULL) {
+        // parse dst addr
+        parse_addr(dst_addr_str, &dst_addr);
+    }
 
-    if (dst_addr.port == NULL) {
-        FATAL("destination port is not defined");
+    if (dst_addr.host == NULL || dst_addr.port == NULL) {
+        FATAL("forwarding destination is not defined");
     }
 
 

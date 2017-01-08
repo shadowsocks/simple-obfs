@@ -883,7 +883,8 @@ main(int argc, char **argv)
         char *delim = "|";
         char *p = strtok(ss_remote_host, delim);
         do {
-            remote_addr[remote_num++].host = p;
+            remote_addr[remote_num].host = p;
+            remote_addr[remote_num++].port = NULL;
         } while ((p = strtok(NULL, delim)));
     }
 
@@ -898,7 +899,6 @@ main(int argc, char **argv)
     if (ss_local_port != NULL) {
         local_port = ss_local_port;
     }
-
 
     int option_index = 0;
 

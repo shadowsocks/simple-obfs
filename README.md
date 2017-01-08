@@ -19,6 +19,8 @@ sudo apt-get install --no-install-recommends build-essential autoconf libtool li
 sudo yum install gcc autoconf libtool automake make zlib-devel openssl-devel asciidoc xmlto
 ./configure && make
 sudo make install
+# Arch
+sudo pacman -Syu gcc autoconf libtool automake make zlib openssl asciidoc xmlto
 ```
 ## Usage
 

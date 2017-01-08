@@ -819,6 +819,7 @@ signal_cb(EV_P_ ev_signal *w, int revents)
 #ifndef __MINGW32__
         case SIGUSR1:
 #endif
+            keep_resolving = 0;
             ev_unloop(EV_A_ EVUNLOOP_ALL);
         }
     }
@@ -844,12 +845,6 @@ accept_cb(EV_P_ ev_io *w, int revents)
     server->listener = listener;
 
     ev_io_start(EV_A_ & server->recv_ctx->io);
-}
-
-void
-resolve_int_cb(int dummy)
-{
-    keep_resolving = 0;
 }
 
 int
@@ -1120,8 +1115,6 @@ main(int argc, char **argv)
     // ignore SIGPIPE
     signal(SIGPIPE, SIG_IGN);
     signal(SIGABRT, SIG_IGN);
-    signal(SIGINT, resolve_int_cb);
-    signal(SIGTERM, resolve_int_cb);
 #endif
 
     // Setup proxy context

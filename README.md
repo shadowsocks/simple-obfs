@@ -32,8 +32,8 @@ man pages of the applications, respectively.
 Add respective item to `--plugin` arg or as value of `plugin` in JSON.
 
 ```
-obfs-local -p 8139 --obfs http --obfs-host www.baidu.com
-obfs-server -p 8139 --obfs http
+obfs-local [-p 8139] --obfs http --obfs-host www.baidu.com
+obfs-server [-p 8139] --obfs http
 ```
 
 ### Example (standalone mode)

@@ -32,13 +32,8 @@ man pages of the applications, respectively.
 Add respective item to `--plugin` arg or as value of `plugin` in JSON.
 
 ```
-<<<<<<< HEAD
-obfs-local [-p 8139] --obfs http --obfs-host www.baidu.com
-obfs-server [-p 8139] --obfs http
-=======
 obfs-local --obfs http --obfs-host www.baidu.com
 obfs-server --obfs http
->>>>>>> upstream/master
 ```
 
 ### Example (standalone mode)

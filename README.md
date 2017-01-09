@@ -25,7 +25,16 @@ sudo make install
 For a detailed and complete list of all supported arguments, you may refer to the
 man pages of the applications, respectively.
 
-### Example
+### Example (plugin mode)
+
+Add respective item to `--plugin` arg or as value of `plugin` in JSON.
+
+```
+obfs-local -p 8139 --obfs http --obfs-host www.baidu.com
+obfs-server -p 8139 --obfs http
+```
+
+### Example (standalone mode)
 
 On the client:
 

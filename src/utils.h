@@ -90,7 +90,7 @@ extern FILE *logfile;
             time_t now = time(NULL);                                             \
             char timestr[20];                                                    \
             strftime(timestr, 20, TIME_FORMAT, localtime(&now));                 \
-            fprintf(logfile, " %s INFO: " format "\n", timestr, ## __VA_ARGS__); \
+            fprintf(logfile, " %s [simple-obfs] INFO: " format "\n", timestr, ## __VA_ARGS__); \
             fflush(logfile); }                                                   \
     }                                                                            \
     while (0)
@@ -101,7 +101,7 @@ extern FILE *logfile;
             time_t now = time(NULL);                             \
             char timestr[20];                                    \
             strftime(timestr, 20, TIME_FORMAT, localtime(&now)); \
-            fprintf(logfile, " %s ERROR: " format "\n", timestr, \
+            fprintf(logfile, " %s [simple-obfs] ERROR: " format "\n", timestr, \
                     ## __VA_ARGS__);                             \
             fflush(logfile); }                                   \
     }                                                            \
@@ -120,7 +120,7 @@ extern FILE *logfile;
         time_t now = time(NULL);                                            \
         char timestr[20];                                                   \
         strftime(timestr, 20, TIME_FORMAT, localtime(&now));                \
-        fprintf(stderr, " %s INFO: " format "\n", timestr, ## __VA_ARGS__); \
+        fprintf(stderr, "%s [simple-obfs] INFO: " format "\n", timestr, ## __VA_ARGS__); \
         fflush(stderr); }                                                   \
     while (0)
 
@@ -129,7 +129,7 @@ extern FILE *logfile;
         time_t now = time(NULL);                                             \
         char timestr[20];                                                    \
         strftime(timestr, 20, TIME_FORMAT, localtime(&now));                 \
-        fprintf(stderr, " %s ERROR: " format "\n", timestr, ## __VA_ARGS__); \
+        fprintf(stderr, "%s [simple-obfs] ERROR: " format "\n", timestr, ## __VA_ARGS__); \
         fflush(stderr); }                                                    \
     while (0)
 
@@ -163,10 +163,10 @@ extern int use_syslog;
             char timestr[20];                                                    \
             strftime(timestr, 20, TIME_FORMAT, localtime(&now));                 \
             if (use_tty) {                                                       \
-                fprintf(stderr, "\e[01;32m %s INFO: \e[0m" format "\n", timestr, \
+                fprintf(stderr, "\e[01;32m %s [simple-obfs] INFO: \e[0m" format "\n", timestr, \
                         ## __VA_ARGS__);                                         \
             } else {                                                             \
-                fprintf(stderr, " %s INFO: " format "\n", timestr,               \
+                fprintf(stderr, " %s [simple-obfs] INFO: " format "\n", timestr,               \
                         ## __VA_ARGS__);                                         \
             }                                                                    \
         }                                                                        \
@@ -182,10 +182,10 @@ extern int use_syslog;
             char timestr[20];                                                     \
             strftime(timestr, 20, TIME_FORMAT, localtime(&now));                  \
             if (use_tty) {                                                        \
-                fprintf(stderr, "\e[01;35m %s ERROR: \e[0m" format "\n", timestr, \
+                fprintf(stderr, "\e[01;35m %s [simple-obfs] ERROR: \e[0m" format "\n", timestr, \
                         ## __VA_ARGS__);                                          \
             } else {                                                              \
-                fprintf(stderr, " %s ERROR: " format "\n", timestr,               \
+                fprintf(stderr, " %s [simple-obfs] ERROR: " format "\n", timestr,               \
                         ## __VA_ARGS__);                                          \
             }                                                                     \
         } }                                                                       \

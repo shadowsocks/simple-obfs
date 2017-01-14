@@ -122,9 +122,11 @@ CONFIG_CLEAN_VPATH_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 PROGRAMS = $(bin_PROGRAMS)
 am__obfs_local_SOURCES_DIST = utils.c jconf.c json.c encrypt.c \
-	netutils.c local.c obfs_http.c obfs_tls.c base64.c win32.c
+	netutils.c local.c obfs_http.c obfs_tls.c options.c base64.c \
+	win32.c
 am__objects_1 = obfs_local-obfs_http.$(OBJEXT) \
-	obfs_local-obfs_tls.$(OBJEXT) obfs_local-base64.$(OBJEXT)
+	obfs_local-obfs_tls.$(OBJEXT) obfs_local-options.$(OBJEXT) \
+	obfs_local-base64.$(OBJEXT)
 @BUILD_WINCOMPAT_TRUE@am__objects_2 = obfs_local-win32.$(OBJEXT)
 am_obfs_local_OBJECTS = obfs_local-utils.$(OBJEXT) \
 	obfs_local-jconf.$(OBJEXT) obfs_local-json.$(OBJEXT) \
@@ -144,7 +146,8 @@ obfs_local_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(obfs_local_CFLAGS) \
 	$(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 am__objects_3 = obfs_server-obfs_http.$(OBJEXT) \
-	obfs_server-obfs_tls.$(OBJEXT) obfs_server-base64.$(OBJEXT)
+	obfs_server-obfs_tls.$(OBJEXT) obfs_server-options.$(OBJEXT) \
+	obfs_server-base64.$(OBJEXT)
 am_obfs_server_OBJECTS = obfs_server-utils.$(OBJEXT) \
 	obfs_server-netutils.$(OBJEXT) obfs_server-jconf.$(OBJEXT) \
 	obfs_server-json.$(OBJEXT) obfs_server-encrypt.$(OBJEXT) \
@@ -353,6 +356,7 @@ OBFS_COMMON_LIBS = $(top_builddir)/libcork/libcork.la $(INET_NTOP_LIB) \
 	$(LIBPCRE_LIBS) $(am__append_2) $(am__append_3)
 obfs_src = obfs_http.c \
 		   obfs_tls.c \
+		   options.c \
 		   base64.c
 
 obfs_local_SOURCES = utils.c jconf.c json.c encrypt.c netutils.c \
@@ -476,6 +480,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/obfs_local-netutils.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/obfs_local-obfs_http.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/obfs_local-obfs_tls.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/obfs_local-options.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/obfs_local-utils.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/obfs_local-win32.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/obfs_server-base64.Po@am__quote@
@@ -485,6 +490,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/obfs_server-netutils.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/obfs_server-obfs_http.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/obfs_server-obfs_tls.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/obfs_server-options.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/obfs_server-resolv.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/obfs_server-server.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/obfs_server-utils.Po@am__quote@
@@ -624,6 +630,20 @@ obfs_local-obfs_tls.obj: obfs_tls.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='obfs_tls.c' object='obfs_local-obfs_tls.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(obfs_local_CFLAGS) $(CFLAGS) -c -o obfs_local-obfs_tls.obj `if test -f 'obfs_tls.c'; then $(CYGPATH_W) 'obfs_tls.c'; else $(CYGPATH_W) '$(srcdir)/obfs_tls.c'; fi`
+
+obfs_local-options.o: options.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(obfs_local_CFLAGS) $(CFLAGS) -MT obfs_local-options.o -MD -MP -MF $(DEPDIR)/obfs_local-options.Tpo -c -o obfs_local-options.o `test -f 'options.c' || echo '$(srcdir)/'`options.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/obfs_local-options.Tpo $(DEPDIR)/obfs_local-options.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='options.c' object='obfs_local-options.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(obfs_local_CFLAGS) $(CFLAGS) -c -o obfs_local-options.o `test -f 'options.c' || echo '$(srcdir)/'`options.c
+
+obfs_local-options.obj: options.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(obfs_local_CFLAGS) $(CFLAGS) -MT obfs_local-options.obj -MD -MP -MF $(DEPDIR)/obfs_local-options.Tpo -c -o obfs_local-options.obj `if test -f 'options.c'; then $(CYGPATH_W) 'options.c'; else $(CYGPATH_W) '$(srcdir)/options.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/obfs_local-options.Tpo $(DEPDIR)/obfs_local-options.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='options.c' object='obfs_local-options.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(obfs_local_CFLAGS) $(CFLAGS) -c -o obfs_local-options.obj `if test -f 'options.c'; then $(CYGPATH_W) 'options.c'; else $(CYGPATH_W) '$(srcdir)/options.c'; fi`
 
 obfs_local-base64.o: base64.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(obfs_local_CFLAGS) $(CFLAGS) -MT obfs_local-base64.o -MD -MP -MF $(DEPDIR)/obfs_local-base64.Tpo -c -o obfs_local-base64.o `test -f 'base64.c' || echo '$(srcdir)/'`base64.c
@@ -778,6 +798,20 @@ obfs_server-obfs_tls.obj: obfs_tls.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='obfs_tls.c' object='obfs_server-obfs_tls.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(obfs_server_CFLAGS) $(CFLAGS) -c -o obfs_server-obfs_tls.obj `if test -f 'obfs_tls.c'; then $(CYGPATH_W) 'obfs_tls.c'; else $(CYGPATH_W) '$(srcdir)/obfs_tls.c'; fi`
+
+obfs_server-options.o: options.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(obfs_server_CFLAGS) $(CFLAGS) -MT obfs_server-options.o -MD -MP -MF $(DEPDIR)/obfs_server-options.Tpo -c -o obfs_server-options.o `test -f 'options.c' || echo '$(srcdir)/'`options.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/obfs_server-options.Tpo $(DEPDIR)/obfs_server-options.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='options.c' object='obfs_server-options.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(obfs_server_CFLAGS) $(CFLAGS) -c -o obfs_server-options.o `test -f 'options.c' || echo '$(srcdir)/'`options.c
+
+obfs_server-options.obj: options.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(obfs_server_CFLAGS) $(CFLAGS) -MT obfs_server-options.obj -MD -MP -MF $(DEPDIR)/obfs_server-options.Tpo -c -o obfs_server-options.obj `if test -f 'options.c'; then $(CYGPATH_W) 'options.c'; else $(CYGPATH_W) '$(srcdir)/options.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/obfs_server-options.Tpo $(DEPDIR)/obfs_server-options.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='options.c' object='obfs_server-options.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(obfs_server_CFLAGS) $(CFLAGS) -c -o obfs_server-options.obj `if test -f 'options.c'; then $(CYGPATH_W) 'options.c'; else $(CYGPATH_W) '$(srcdir)/options.c'; fi`
 
 obfs_server-base64.o: base64.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(obfs_server_CFLAGS) $(CFLAGS) -MT obfs_server-base64.o -MD -MP -MF $(DEPDIR)/obfs_server-base64.Tpo -c -o obfs_server-base64.o `test -f 'base64.c' || echo '$(srcdir)/'`base64.c

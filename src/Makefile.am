@@ -26,6 +26,7 @@ endif
 
 obfs_src = obfs_http.c \
 		   obfs_tls.c \
+		   options.c \
 		   base64.c
 
 obfs_local_SOURCES = utils.c \

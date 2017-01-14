@@ -62,6 +62,7 @@
 #include "utils.h"
 #include "obfs_http.h"
 #include "obfs_tls.h"
+#include "options.h"
 #include "server.h"
 
 #ifndef EAGAIN
@@ -1083,6 +1084,7 @@ main(int argc, char **argv)
     char *ss_remote_port = getenv("SS_REMOTE_PORT");
     char *ss_local_host  = getenv("SS_LOCAL_HOST");
     char *ss_local_port  = getenv("SS_LOCAL_PORT");
+    char *ss_plugin_opts = getenv("SS_PLUGIN_OPTIONS");
 
     if (ss_remote_host != NULL) {
         ss_remote_host = strdup(ss_remote_host);
@@ -1103,6 +1105,60 @@ main(int argc, char **argv)
 
     if (ss_local_port != NULL) {
         dst_addr.port =  ss_local_port;
+    }
+
+    if (ss_plugin_opts != NULL) {
+        ss_plugin_opts = strdup(ss_plugin_opts);
+        options_t opts;
+        int opt_num = parse_options(ss_plugin_opts,
+                strlen(ss_plugin_opts), &opts);
+        for (i = 0; i < opt_num; i++) {
+            char *key = opts.keys[i];
+            char *value = opts.values[i];
+            if (key == NULL) continue;
+            size_t key_len = strlen(key);
+            if (key_len == 0) continue;
+            if (key_len == 1) {
+                char c = key[0];
+                switch (c) {
+                    case 'b':
+                        bind_address = value;
+                        break;
+                    case 't':
+                        timeout = value;
+                        break;
+                    case 'c':
+                        conf_path = value;
+                        break;
+                    case 'i':
+                        iface = value;
+                        break;
+                    case 'a':
+                        user = value;
+                        break;
+                    case 'v':
+                        verbose = 1;
+                        break;
+                    case '6':
+                        ipv6first = 1;
+                        break;
+                    }
+            } else {
+                if (strcmp(key, "fast-open") == 0) {
+                    fast_open = 1;
+                } else if (strcmp(key, "obfs") == 0) {
+                    if (strcmp(value, obfs_http->name) == 0)
+                        obfs_para = obfs_http;
+                    else if (strcmp(value, obfs_tls->name) == 0)
+                        obfs_para = obfs_tls;
+#ifdef __linux__
+                } else if (strcmp(key, "mptcp") == 0) {
+                    mptcp = 1;
+                    LOGI("enable multipath TCP");
+#endif
+                }
+            }
+        }
     }
 
     int option_index                    = 0;

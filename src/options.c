@@ -42,7 +42,8 @@ parse_options(char *str, size_t str_len, options_t *opts)
 
     opts->keys[0] = str;
 
-    while (i < str_len && str[i] != '\0') {
+    while (opt_idx < MAX_OPTION_NUM
+            && i < str_len && str[i] != '\0') {
         char c = str[i];
         switch (c) {
             case '\\':
@@ -81,7 +82,7 @@ parse_options(char *str, size_t str_len, options_t *opts)
     return opts->num;
 }
 
-char*
+const char*
 get_opt(const char *key, options_t *opts)
 {
     int i;
@@ -93,5 +94,5 @@ get_opt(const char *key, options_t *opts)
                 return key;
         }
     }
-    return NULL:
+    return NULL;
 }

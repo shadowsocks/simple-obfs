@@ -31,6 +31,6 @@ typedef struct options {
 } options_t;
 
 int parse_options(char *str, size_t str_len, options_t *opts);
-char *get_opt(const char *key, options_t *opts);
+const char *get_opt(const char *key, options_t *opts);
 
 #endif // _OPTIONS_H

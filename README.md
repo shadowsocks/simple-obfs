@@ -27,13 +27,20 @@ sudo make install
 For a detailed and complete list of all supported arguments, you may refer to the
 man pages of the applications, respectively.
 
-### Example (plugin mode)
+### Example (plugin mode with shadowsocks)
 
-Add respective item to `--plugin` arg or as value of `plugin` in JSON.
+Add respective item to `--plugin` and `--plugin-opts` arg or as value of `plugin` and `plugin_opts` in JSON.
 
+One the client:
+
+```bash
+ss-local -c config.json --plugin obfs-local --plugin-opts "obfs=http;obfs-host=www.baidu.com"
 ```
-obfs-local --obfs http --obfs-host www.baidu.com
-obfs-server --obfs http
+
+On the server:
+
+```bash
+ss-server -c config.json --plugin obfs-server --plugin-opts "obfs=http"
 ```
 
 ### Example (standalone mode)

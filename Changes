@@ -2,7 +2,7 @@ simple-obfs (0.0.2-1) unstable; urgency=medium
 
   * Refine SIP003 interfaces.
 
- -- Max Lv <max.c.lv@gmail.com>  Mon, 16 Jan 2016 10:53:34 +0800
+ -- Max Lv <max.c.lv@gmail.com>  Mon, 16 Jan 2017 10:53:34 +0800
 
 simple-obfs (0.0.1-1) unstable; urgency=medium
 

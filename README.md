@@ -5,7 +5,7 @@
 Simple-obfs is a simple obfusacting tool, designed
 as plugin server of shadowsocks.
 
-Current version: 0.0.1 | [Changelog](Changes)
+Current version: 0.0.2 | [Changelog](Changes)
 
 ## Build
 

@@ -34,7 +34,7 @@ Add respective item to `--plugin` and `--plugin-opts` arg or as value of `plugin
 One the client:
 
 ```bash
-ss-local -c config.json --plugin obfs-local --plugin-opts "obfs=http;obfs-host=www.baidu.com"
+ss-local -c config.json --plugin obfs-local --plugin-opts "obfs=http;obfs-host=www.bing.com"
 ```
 
 On the server:
@@ -48,7 +48,7 @@ ss-server -c config.json --plugin obfs-server --plugin-opts "obfs=http"
 On the client:
 
 ```bash
-obfs-local -s server_ip -p 8139 -l 1984 --obfs http --obfs-host www.baidu.com
+obfs-local -s server_ip -p 8139 -l 1984 --obfs http --obfs-host www.bing.com
 ss-local -c config.json -s 127.0.0.1 -p 1984 -l 1080
 ```
 

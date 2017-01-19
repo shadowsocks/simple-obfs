@@ -24,12 +24,6 @@
 /* Define to 1 if you have the `CCCryptorCreateWithMode' function. */
 #undef HAVE_CCCRYPTORCREATEWITHMODE
 
-/* Define to 1 if you have the `clock_gettime' function. */
-#undef HAVE_CLOCK_GETTIME
-
-/* Define to 1 to use the syscall interface for clock_gettime */
-#undef HAVE_CLOCK_SYSCALL
-
 /* Define to 1 if you have the <CommonCrypto/CommonCrypto.h> header file. */
 #undef HAVE_COMMONCRYPTO_COMMONCRYPTO_H
 
@@ -40,17 +34,8 @@
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #undef HAVE_DLFCN_H
 
-/* Define to 1 if you have the `epoll_ctl' function. */
-#undef HAVE_EPOLL_CTL
-
-/* Define to 1 if you have the `eventfd' function. */
-#undef HAVE_EVENTFD
-
 /* Define to 1 if you have the <fcntl.h> header file. */
 #undef HAVE_FCNTL_H
-
-/* Define to 1 if the floor function is available */
-#undef HAVE_FLOOR
 
 /* Define to 1 if you have the `fork' function. */
 #undef HAVE_FORK
@@ -61,26 +46,14 @@
 /* Define to 1 if you have the `inet_ntop' function. */
 #undef HAVE_INET_NTOP
 
-/* Define to 1 if you have the `inotify_init' function. */
-#undef HAVE_INOTIFY_INIT
-
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
-
-/* Enable IPv6 support in libudns */
-#undef HAVE_IPv6
-
-/* Define to 1 if you have the `kqueue' function. */
-#undef HAVE_KQUEUE
 
 /* Define to 1 if you have the <langinfo.h> header file. */
 #undef HAVE_LANGINFO_H
 
 /* Define to 1 if you have the `ev' library (-lev). */
 #undef HAVE_LIBEV
-
-/* Define to 1 if you have the `rt' library (-lrt). */
-#undef HAVE_LIBRT
 
 /* Define to 1 if you have the `socket' library (-lsocket). */
 #undef HAVE_LIBSOCKET
@@ -116,9 +89,6 @@
 /* Define to 1 if you have the `memset' function. */
 #undef HAVE_MEMSET
 
-/* Define to 1 if you have the `nanosleep' function. */
-#undef HAVE_NANOSLEEP
-
 /* Define to 1 if you have the <netdb.h> header file. */
 #undef HAVE_NETDB_H
 
@@ -127,18 +97,6 @@
 
 /* Define to 1 if you have the <net/if.h> header file. */
 #undef HAVE_NET_IF_H
-
-/* Define to 1 if you have the `poll' function. */
-#undef HAVE_POLL
-
-/* Define to 1 if you have the <poll.h> header file. */
-#undef HAVE_POLL_H
-
-/* Define to 1 if you have the `port_create' function. */
-#undef HAVE_PORT_CREATE
-
-/* Define to 1 if you have the <port.h> header file. */
-#undef HAVE_PORT_H
 
 /* Have PTHREAD_PRIO_INHERIT. */
 #undef HAVE_PTHREAD_PRIO_INHERIT
@@ -154,9 +112,6 @@
 
 /* Define to 1 if you have the `setrlimit' function. */
 #undef HAVE_SETRLIMIT
-
-/* Define to 1 if you have the `signalfd' function. */
-#undef HAVE_SIGNALFD
 
 /* Define to 1 if you have the `socket' function. */
 #undef HAVE_SOCKET
@@ -176,26 +131,11 @@
 /* Define to 1 if you have the <string.h> header file. */
 #undef HAVE_STRING_H
 
-/* Define to 1 if you have the <sys/epoll.h> header file. */
-#undef HAVE_SYS_EPOLL_H
-
-/* Define to 1 if you have the <sys/eventfd.h> header file. */
-#undef HAVE_SYS_EVENTFD_H
-
-/* Define to 1 if you have the <sys/event.h> header file. */
-#undef HAVE_SYS_EVENT_H
-
-/* Define to 1 if you have the <sys/inotify.h> header file. */
-#undef HAVE_SYS_INOTIFY_H
-
 /* Define to 1 if you have the <sys/ioctl.h> header file. */
 #undef HAVE_SYS_IOCTL_H
 
 /* Define to 1 if you have the <sys/select.h> header file. */
 #undef HAVE_SYS_SELECT_H
-
-/* Define to 1 if you have the <sys/signalfd.h> header file. */
-#undef HAVE_SYS_SIGNALFD_H
 
 /* Define to 1 if you have the <sys/socket.h> header file. */
 #undef HAVE_SYS_SOCKET_H
@@ -233,7 +173,8 @@
 /* Define to 1 if you have the <ws2tcpip.h> header file. */
 #undef HAVE_WS2TCPIP_H
 
-/* Define to the sub-directory where libtool stores uninstalled libraries. */
+/* Define to the sub-directory in which libtool stores uninstalled libraries.
+   */
 #undef LT_OBJDIR
 
 /* Define to 1 if assertions should be disabled. */

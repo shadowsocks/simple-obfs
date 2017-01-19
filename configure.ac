@@ -20,18 +20,6 @@ AC_DISABLE_STATIC
 AC_DISABLE_SHARED
 LT_INIT([dlopen])
 
-dnl Checks for using shared libraries from system
-AC_ARG_ENABLE(
-  [system-shared-lib],
-  AS_HELP_STRING([--enable-system-shared-lib], [build against shared libraries when possible]),
-  [
-    case "${enableval}" in
-      yes) enable_system_shared_lib=true ;;
-      no) enable_system_shared_lib=false ;;
-      *) AC_MSG_ERROR([bad value ${enableval} for --enable-system-shared-lib]) ;;
-    esac], [enable_system_shared_lib=false])
-AM_CONDITIONAL([USE_SYSTEM_SHARED_LIB], [test x$enable_system_shared_lib = xtrue])
-
 AC_ARG_ENABLE([documentation],
   AS_HELP_STRING([--disable-documentation], [do not build documentation]),
   [disable_documentation=true],
@@ -56,11 +44,6 @@ AC_PROG_LN_S
 AC_PROG_LIBTOOL
 AC_PROG_MAKE_SET
 AC_LANG_SOURCE
-
-dnl Checks for libev
-AM_COND_IF([USE_SYSTEM_SHARED_LIB],
-  [],
-  [m4_include([libev/libev.m4])])
 
 dnl Add library for mingw
 case $host in
@@ -285,26 +268,16 @@ AC_CHECK_LIB(socket, connect)
 dnl Checks for library functions.
 AC_CHECK_FUNCS([malloc memset socket])
 
-dnl Add define for libudns to enable IPv6 support
-dnl This is an option defined in the origin configure script
-AC_DEFINE([HAVE_IPv6], [1], [Enable IPv6 support in libudns])
-
-AM_COND_IF([USE_SYSTEM_SHARED_LIB],[
-    AC_CHECK_LIB([sodium], [sodium_init], ,[
-       AC_MSG_ERROR([Couldn't find libsodium. Try installing libsodium-dev@<:@el@:>@.])
-    ])
-  ],
-  [AC_CONFIG_SUBDIRS([libsodium])])
+AC_CHECK_LIB([sodium], [sodium_init], ,[
+   AC_MSG_ERROR([Couldn't find libsodium. Try installing libsodium-dev@<:@el@:>@.])
+])
 
 AC_CONFIG_FILES([Makefile
                  libcork/Makefile
                  src/Makefile])
-AM_COND_IF([USE_SYSTEM_SHARED_LIB],[
-    AC_CHECK_LIB([udns], [dns_dnlen], ,[AC_MSG_ERROR([Couldn't find libudns. Try installing libudns-dev or udns-devel.])])
-    AC_CHECK_LIB([ev], [ev_loop_destroy], ,[AC_MSG_ERROR([Couldn't find libev. Try installing libev-dev@<:@el@:>@.])])
-  ],
-  [AC_CONFIG_FILES([libudns/Makefile
-                 libev/Makefile])])
+
+AC_CHECK_LIB([udns], [dns_dnlen], ,[AC_MSG_ERROR([Couldn't find libudns. Try installing libudns-dev or udns-devel.])])
+AC_CHECK_LIB([ev], [ev_loop_destroy], ,[AC_MSG_ERROR([Couldn't find libev. Try installing libev-dev@<:@el@:>@.])])
 
 AM_COND_IF([ENABLE_DOCUMENTATION],
   [AC_CONFIG_FILES([doc/Makefile])

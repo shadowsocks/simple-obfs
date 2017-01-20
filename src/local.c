@@ -90,7 +90,6 @@ int vpn        = 0;
 uint64_t tx    = 0;
 uint64_t rx    = 0;
 ev_tstamp last = 0;
-char *prefix;
 #endif
 
 static int ipv6first = 0;
@@ -930,9 +929,6 @@ main(int argc, char **argv)
                     case 'V':
                         vpn = 1;
                         break;
-                    case 'P':
-                        prefix = value;
-                        break;
 #endif
                     case '6':
                         ipv6first = 1;
@@ -974,7 +970,7 @@ main(int argc, char **argv)
     USE_TTY();
 
 #ifdef ANDROID
-    while ((c = getopt_long(argc, argv, "f:s:p:l:t:i:c:b:a:n:P:hvV6",
+    while ((c = getopt_long(argc, argv, "f:s:p:l:t:i:c:b:a:n:hvV6",
                             long_options, &option_index)) != -1) {
 #else
     while ((c = getopt_long(argc, argv, "f:s:p:l:t:i:c:b:a:n:hv6",
@@ -1047,9 +1043,6 @@ main(int argc, char **argv)
 #ifdef ANDROID
         case 'V':
             vpn = 1;
-            break;
-        case 'P':
-            prefix = optarg;
             break;
 #endif
         case '?':

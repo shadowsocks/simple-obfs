@@ -136,6 +136,22 @@ setnonblocking(int fd)
 
 #endif
 
+static void
+parent_watcher_cb(EV_P_ ev_timer *watcher, int revents)
+{
+    static int ppid = -1;
+
+    int cur_ppid = getppid();
+    if (ppid != -1) {
+        if (ppid != cur_ppid) {
+            keep_resolving = 0;
+            ev_unloop(EV_A_ EVUNLOOP_ALL);
+        }
+    }
+
+    ppid = cur_ppid;
+}
+
 int
 create_and_bind(const char *addr, const char *port)
 {
@@ -1195,6 +1211,10 @@ main(int argc, char **argv)
     ev_signal_init(&sigterm_watcher, signal_cb, SIGTERM);
     ev_signal_start(EV_DEFAULT, &sigint_watcher);
     ev_signal_start(EV_DEFAULT, &sigterm_watcher);
+
+    ev_timer parent_watcher;
+    ev_timer_init(&parent_watcher, parent_watcher_cb, UPDATE_INTERVAL, UPDATE_INTERVAL);
+    ev_timer_start(EV_DEFAULT, &parent_watcher);
 
     struct ev_loop *loop = EV_DEFAULT;
 

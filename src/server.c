@@ -81,10 +81,6 @@
 #define SSMAXCONN 1024
 #endif
 
-#ifndef UPDATE_INTERVAL
-#define UPDATE_INTERVAL 30
-#endif
-
 static void signal_cb(EV_P_ ev_signal *w, int revents);
 static void accept_cb(EV_P_ ev_io *w, int revents);
 static void server_send_cb(EV_P_ ev_io *w, int revents);
@@ -124,6 +120,21 @@ uint64_t tx                  = 0;
 uint64_t rx                  = 0;
 
 static struct cork_dllist connections;
+
+static void
+parent_watcher_cb(EV_P_ ev_timer *watcher, int revents)
+{
+    static int ppid = -1;
+
+    int cur_ppid = getppid();
+    if (ppid != -1) {
+        if (ppid != cur_ppid) {
+            ev_unloop(EV_A_ EVUNLOOP_ALL);
+        }
+    }
+
+    ppid = cur_ppid;
+}
 
 static void
 free_connections(struct ev_loop *loop)
@@ -1446,6 +1457,10 @@ main(int argc, char **argv)
 
     // Init connections
     cork_dllist_init(&connections);
+
+    ev_timer parent_watcher;
+    ev_timer_init(&parent_watcher, parent_watcher_cb, UPDATE_INTERVAL, UPDATE_INTERVAL);
+    ev_timer_start(EV_DEFAULT, &parent_watcher);
 
     // start ev loop
     ev_run(loop, 0);

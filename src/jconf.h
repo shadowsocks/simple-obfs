@@ -29,6 +29,7 @@
 #define MAX_CONNECT_TIMEOUT 10
 #define MAX_REQUEST_TIMEOUT 60
 #define MIN_UDP_TIMEOUT 10
+#define UPDATE_INTERVAL 5
 
 typedef struct {
     char *host;

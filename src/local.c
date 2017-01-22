@@ -1213,7 +1213,7 @@ main(int argc, char **argv)
     ev_signal_start(EV_DEFAULT, &sigterm_watcher);
 
     ev_timer parent_watcher;
-    ev_timer_init(&parent_watcher, parent_watcher_cb, UPDATE_INTERVAL, UPDATE_INTERVAL);
+    ev_timer_init(&parent_watcher, parent_watcher_cb, 0, UPDATE_INTERVAL);
     ev_timer_start(EV_DEFAULT, &parent_watcher);
 
     struct ev_loop *loop = EV_DEFAULT;

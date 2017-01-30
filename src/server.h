@@ -39,6 +39,7 @@ typedef struct listen_ctx {
     int timeout;
     int method;
     ss_addr_t *dst_addr;
+    ss_addr_t *failover;
     char *iface;
     struct ev_loop *loop;
 } listen_ctx_t;

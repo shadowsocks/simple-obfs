@@ -450,7 +450,7 @@ server_recv_cb(EV_P_ ev_io *w, int revents)
             int ret = obfs_para->check_obfs(buf);
             if (ret == OBFS_NEED_MORE) {
                 return;
-            } else if (ret) {
+            } else if (ret == OBFS_OK) {
                 // obfs is enabled
                 ret = obfs_para->deobfs_request(buf, BUF_SIZE, server->obfs);
                 if (ret == OBFS_NEED_MORE)
@@ -503,6 +503,14 @@ server_recv_cb(EV_P_ ev_io *w, int revents)
         size_t name_len = strlen(server->listen_ctx->dst_addr->host);
         char *host = server->listen_ctx->dst_addr->host;
         uint16_t port = htons((uint16_t)atoi(server->listen_ctx->dst_addr->port));
+
+        if (obfs_para == NULL || !obfs_para->is_enable(server->obfs)) {
+            if (server->listen_ctx->failover != NULL) {
+                name_len = strlen(server->listen_ctx->failover->host);
+                host = server->listen_ctx->failover->host;
+                port = htons((uint16_t)atoi(server->listen_ctx->failover->port));
+            }
+        }
 
         struct cork_ip ip;
         if (cork_ip_init(&ip, host) != -1) {
@@ -1090,6 +1098,9 @@ main(int argc, char **argv)
 
     ss_addr_t dst_addr = { .host = NULL, .port = NULL };
     char *dst_addr_str = NULL;
+    ss_addr_t failover = { .host = NULL, .port = NULL };
+    char *failover_str = NULL;
+    char *obfs_host = NULL;
 
     char *ss_remote_host = getenv("SS_REMOTE_HOST");
     char *ss_remote_port = getenv("SS_REMOTE_PORT");
@@ -1162,6 +1173,10 @@ main(int argc, char **argv)
                         obfs_para = obfs_http;
                     else if (strcmp(value, obfs_tls->name) == 0)
                         obfs_para = obfs_tls;
+                } else if (strcmp(key, "obfs-host") == 0) {
+                    obfs_host = value;
+                } else if (strcmp(key, "failover") == 0) {
+                    failover_str = value;
 #ifdef __linux__
                 } else if (strcmp(key, "mptcp") == 0) {
                     mptcp = 1;
@@ -1177,6 +1192,8 @@ main(int argc, char **argv)
         { "fast-open",       no_argument,       0, 0 },
         { "help",            no_argument,       0, 0 },
         { "obfs",            required_argument, 0, 0 },
+        { "obfs-host",       required_argument, 0, 0 },
+        { "failover",        required_argument, 0, 0 },
 #ifdef __linux__
         { "mptcp",           no_argument,       0, 0 },
 #endif
@@ -1202,6 +1219,10 @@ main(int argc, char **argv)
                 else if (strcmp(optarg, obfs_tls->name) == 0)
                     obfs_para = obfs_tls;
             } else if (option_index == 3) {
+                obfs_host = optarg;
+            } else if (option_index == 4) {
+                failover_str = optarg;
+            } else if (option_index == 5) {
                 mptcp = 1;
                 LOGI("enable multipath TCP");
             }
@@ -1287,11 +1308,17 @@ main(int argc, char **argv)
         if (dst_addr_str == NULL) {
             dst_addr_str = conf->dst_addr;
         }
+        if (failover_str == NULL) {
+            failover_str = conf->failover;
+        }
         if (obfs_para == NULL && conf->obfs != NULL) {
             if (strcmp(conf->obfs, obfs_http->name) == 0)
                 obfs_para = obfs_http;
             else if (strcmp(conf->obfs, obfs_tls->name) == 0)
                 obfs_para = obfs_tls;
+        }
+        if (obfs_host == NULL) {
+            obfs_host = conf->obfs_host;
         }
         if (mptcp == 0) {
             mptcp = conf->mptcp;
@@ -1332,6 +1359,10 @@ main(int argc, char **argv)
         FATAL("forwarding destination is not defined");
     }
 
+    if (failover_str != NULL) {
+        // parse failover addr
+        parse_addr(failover_str, &failover);
+    }
 
     if (timeout == NULL) {
         timeout = "60";
@@ -1369,7 +1400,10 @@ main(int argc, char **argv)
     }
 
     if (obfs_para) {
+        obfs_para->host = obfs_host;
         LOGI("obfuscating enabled");
+        if (obfs_host)
+            LOGI("obfuscating hostname: %s", obfs_host);
     }
 
 #ifdef __MINGW32__
@@ -1434,6 +1468,7 @@ main(int argc, char **argv)
         listen_ctx->loop    = loop;
 
         listen_ctx->dst_addr = &dst_addr;
+        listen_ctx->failover = &failover;
 
         ev_io_init(&listen_ctx->io, accept_cb, listenfd, EV_READ);
         ev_io_start(loop, &listen_ctx->io);

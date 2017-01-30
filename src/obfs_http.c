@@ -25,6 +25,7 @@
 #endif
 
 #include <strings.h>
+#include <ctype.h> /* isblank() */
 
 #include "base64.h"
 #include "utils.h"
@@ -54,6 +55,9 @@ static int deobfs_http_header(buffer_t *, size_t, obfs_t *);
 static int check_http_header(buffer_t *buf);
 static void disable_http(obfs_t *obfs);
 static int is_enable_http(obfs_t *obfs);
+
+static int get_header(const char *, const char *, int, char **);
+static int next_header(const char **, int *);
 
 static obfs_para_t obfs_http_st = {
     .name            = "http",
@@ -189,14 +193,103 @@ check_http_header(buffer_t *buf)
     int len    = buf->len;
 
     if (len < 4)
+        return OBFS_NEED_MORE;
+
+    if (strncasecmp(data, "GET", 3) != 0)
+        return OBFS_ERROR;
+
+    if (obfs_http->host != NULL) {
+        char *hostname;
+        int i;
+
+        int result = get_header("Host:", data, len, &hostname);
+        if (result < 0) {
+            if (result == -1)
+                return OBFS_NEED_MORE;
+            else
+                return OBFS_ERROR;
+        }
+
+        /*
+         *  if the user specifies the port in the request, it is included here.
+         *  Host: example.com:80
+         *  so we trim off port portion
+         */
+        for (i = result - 1; i >= 0; i--)
+            if ((hostname)[i] == ':') {
+                (hostname)[i] = '\0';
+                result         = i;
+                break;
+            }
+
+        result = OBFS_ERROR;
+        if (strncasecmp(hostname, obfs_http->host, result) == 0) {
+            result = OBFS_OK;
+        }
+        free(hostname);
+        return result;
+    }
+
+    return OBFS_OK;
+}
+
+static int
+get_header(const char *header, const char *data, int data_len, char **value)
+{
+    int len, header_len;
+
+    header_len = strlen(header);
+
+    /* loop through headers stopping at first blank line */
+    while ((len = next_header(&data, &data_len)) != 0)
+        if (len > header_len && strncasecmp(header, data, header_len) == 0) {
+            /* Eat leading whitespace */
+            while (header_len < len && isblank((unsigned char)data[header_len]))
+                header_len++;
+
+            *value = malloc(len - header_len + 1);
+            if (*value == NULL)
+                return -4;
+
+            strncpy(*value, data + header_len, len - header_len);
+            (*value)[len - header_len] = '\0';
+
+            return len - header_len;
+        }
+
+    /* If there is no data left after reading all the headers then we do not
+     * have a complete HTTP request, there must be a blank line */
+    if (data_len == 0)
         return -1;
 
-    if (strncasecmp(data, "GET", 3) == 0)
-        return 1;
-    else if (strncasecmp(data, "HTTP", 4) == 0)
-        return 1;
+    return -2;
+}
 
-    return 0;
+static int
+next_header(const char **data, int *len)
+{
+    int header_len;
+
+    /* perhaps we can optimize this to reuse the value of header_len, rather
+     * than scanning twice.
+     * Walk our data stream until the end of the header */
+    while (*len > 2 && (*data)[0] != '\r' && (*data)[1] != '\n') {
+        (*len)--;
+        (*data)++;
+    }
+
+    /* advanced past the <CR><LF> pair */
+    *data += 2;
+    *len  -= 2;
+
+    /* Find the length of the next header */
+    header_len = 0;
+    while (*len > header_len + 1
+           && (*data)[header_len] != '\r'
+           && (*data)[header_len + 1] != '\n')
+        header_len++;
+
+    return header_len;
 }
 
 static void

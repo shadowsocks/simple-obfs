@@ -506,12 +506,15 @@ check_tls_request(buffer_t *buf)
     if (len < 11)
         return OBFS_NEED_MORE;
 
-    return data[0] == 0x16
+    if (data[0] == 0x16
         && data[1] == 0x03
         && data[2] == 0x01
         && data[5] == 0x01
         && data[9] == 0x03
-        && data[10] == 0x03;
+        && data[10] == 0x03)
+        return OBFS_OK;
+    else
+        return OBFS_ERROR;
 }
 
 static void

@@ -1173,7 +1173,8 @@ main(int argc, char **argv)
             obfs_para->host = "cloudfront.net";
         obfs_para->port = atoi(remote_port);
         LOGI("obfuscating enabled");
-        LOGI("obfuscating hostname: %s", obfs_host);
+        if (obfs_host)
+            LOGI("obfuscating hostname: %s", obfs_host);
     }
 
 #ifdef __MINGW32__

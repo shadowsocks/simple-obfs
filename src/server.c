@@ -505,7 +505,8 @@ server_recv_cb(EV_P_ ev_io *w, int revents)
         uint16_t port = htons((uint16_t)atoi(server->listen_ctx->dst_addr->port));
 
         if (obfs_para == NULL || !obfs_para->is_enable(server->obfs)) {
-            if (server->listen_ctx->failover != NULL) {
+            if (server->listen_ctx->failover->host != NULL
+                    && server->listen_ctx->failover->port != NULL) {
                 name_len = strlen(server->listen_ctx->failover->host);
                 host = server->listen_ctx->failover->host;
                 port = htons((uint16_t)atoi(server->listen_ctx->failover->port));

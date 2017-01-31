@@ -198,6 +198,19 @@ check_http_header(buffer_t *buf)
     if (strncasecmp(data, "GET", 3) != 0)
         return OBFS_ERROR;
 
+    {
+        char *protocol;
+        int result = get_header("Upgrade:", data, len, &protocol);
+        if (result < 0) {
+            if (result == -1)
+                return OBFS_NEED_MORE;
+            else
+                return OBFS_ERROR;
+        }
+        if (strncmp(protocol, "websocket", result) != 0)
+            return OBFS_ERROR;
+    }
+
     if (obfs_http->host != NULL) {
         char *hostname;
         int i;

@@ -7,8 +7,17 @@ as plugin server of shadowsocks.
 
 Current version: 0.0.2 | [Changelog](Changes)
 
-## Build
+## Installation
+### Get the latest source code
 
+To get the latest source code, you should also update the submodules as following:
+
+```bash
+git clone https://github.com/shadowsocks/simple-obfs.git
+cd simple-obfs
+git submodule update --init --recursive
+```
+###  Build
 For Unix-like systems, especially Debian-based systems,
 e.g. Ubuntu, Debian or Linux Mint, you can build the binary like this:
 
@@ -19,6 +28,8 @@ sudo apt-get install --no-install-recommends build-essential autoconf libtool li
 sudo yum install gcc autoconf libtool automake make zlib-devel openssl-devel asciidoc xmlto
 # Arch
 sudo pacman -Syu gcc autoconf libtool automake make zlib openssl asciidoc xmlto
+
+./autogen.sh
 ./configure && make
 sudo make install
 ```
@@ -31,7 +42,7 @@ man pages of the applications, respectively.
 
 Add respective item to `--plugin` and `--plugin-opts` arg or as value of `plugin` and `plugin_opts` in JSON.
 
-One the client:
+On the client:
 
 ```bash
 ss-local -c config.json --plugin obfs-local --plugin-opts "obfs=http;obfs-host=www.bing.com"

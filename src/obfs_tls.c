@@ -527,5 +527,5 @@ disable_tls(obfs_t *obfs)
 static int
 is_enable_tls(obfs_t *obfs)
 {
-    return obfs->obfs_stage == 0 && obfs->deobfs_stage == 0;
+    return obfs->obfs_stage != -1 && obfs->deobfs_stage != -1;
 }

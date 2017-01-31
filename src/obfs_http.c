@@ -207,8 +207,12 @@ check_http_header(buffer_t *buf)
             else
                 return OBFS_ERROR;
         }
-        if (strncmp(protocol, "websocket", result) != 0)
+        if (strncmp(protocol, "websocket", result) != 0) {
+            free(protocol);
             return OBFS_ERROR;
+        } else {
+            free(protocol);
+        }
     }
 
     if (obfs_http->host != NULL) {
@@ -315,5 +319,5 @@ disable_http(obfs_t *obfs)
 static int
 is_enable_http(obfs_t *obfs)
 {
-    return obfs->obfs_stage == 0 && obfs->deobfs_stage == 0;
+    return obfs->obfs_stage != -1 && obfs->deobfs_stage != -1;
 }

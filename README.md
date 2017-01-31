@@ -7,17 +7,7 @@ as plugin server of shadowsocks.
 
 Current version: 0.0.2 | [Changelog](Changes)
 
-## Installation
-### Get the latest source code
-
-To get the latest source code, you should also update the submodules as following:
-
-```bash
-git clone https://github.com/shadowsocks/simple-obfs.git
-cd simple-obfs
-git submodule update --init --recursive
-```
-###  Build
+##  Build
 For Unix-like systems, especially Debian-based systems,
 e.g. Ubuntu, Debian or Linux Mint, you can build the binary like this:
 
@@ -29,6 +19,9 @@ sudo yum install gcc autoconf libtool automake make zlib-devel openssl-devel asc
 # Arch
 sudo pacman -Syu gcc autoconf libtool automake make zlib openssl asciidoc xmlto
 
+git clone https://github.com/shadowsocks/simple-obfs.git
+cd simple-obfs
+git submodule update --init --recursive
 ./autogen.sh
 ./configure && make
 sudo make install

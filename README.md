@@ -7,7 +7,7 @@ as plugin server of shadowsocks.
 
 Current version: 0.0.2 | [Changelog](Changes)
 
-##  Build
+## Build
 For Unix-like systems, especially Debian-based systems,
 e.g. Ubuntu, Debian or Linux Mint, you can build the binary like this:
 

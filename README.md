@@ -31,7 +31,7 @@ sudo make install
 For a detailed and complete list of all supported arguments, you may refer to the
 man pages of the applications, respectively.
 
-### Example (plugin mode with shadowsocks)
+### Plugin mode with shadowsocks
 
 Add respective item to `--plugin` and `--plugin-opts` arg or as value of `plugin` and `plugin_opts` in JSON.
 
@@ -47,7 +47,7 @@ On the server:
 ss-server -c config.json --plugin obfs-server --plugin-opts "obfs=http"
 ```
 
-### Example (standalone mode)
+### Standalone mode
 
 On the client:
 
@@ -61,6 +61,24 @@ On the server:
 ```bash
 obfs-server -s server_ip -p 8139 --obfs http -r 127.0.0.1:8388
 ss-server -c config.json -s 127.0.0.1 -p 8388
+```
+
+### Coexist with an actual Web server
+
+Only applicable on the server:
+
+```bash
+# HTTP only with plugin mode
+ss-server -c config.json --plugin obfs-server --plugin-opts "obfs=http;fallback=example.com"
+
+# Both HTTP and HTTPS with standalone mode
+obfs-server -s server_ip -p 80 --obfs http -r 127.0.0.1:8388 --fallback example.com
+obfs-server -s server_ip -p 443 --obfs tls -r 127.0.0.1:8388 --fallback example.com
+
+# suppose you have an HTTP webserver (apache/nginx/whatever) listening on localhost:8080 and HTTPS on 8443
+# (you probably shouldn't expose these ports)
+obfs-server -s server_ip -p 80 --obfs http -r 127.0.0.1:8388 --fallback 127.0.0.1:8080
+obfs-server -s server_ip -p 443 --obfs tls -r 127.0.0.1:8388 --fallback 127.0.0.1:8443
 ```
 
 ## License

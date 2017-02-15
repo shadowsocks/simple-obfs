@@ -1128,7 +1128,7 @@ main(int argc, char **argv)
     }
 
     if (timeout == NULL) {
-        timeout = "60";
+        timeout = "600";
     }
 
 #ifdef HAVE_SETRLIMIT

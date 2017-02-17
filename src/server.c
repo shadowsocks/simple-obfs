@@ -455,6 +455,8 @@ server_recv_cb(EV_P_ ev_io *w, int revents)
                 ret = obfs_para->deobfs_request(buf, BUF_SIZE, server->obfs);
                 if (ret == OBFS_NEED_MORE)
                     return;
+                else if (ret == OBFS_ERROR)
+                    obfs_para->disable(server->obfs);
             } else {
                 obfs_para->disable(server->obfs);
             }

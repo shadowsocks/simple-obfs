@@ -1,0 +1,3 @@
+src/obfs-server usr/bin/
+src/obfs-local usr/bin/
+#usr/share/man/

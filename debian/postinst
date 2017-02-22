@@ -1,0 +1,37 @@
+#!/bin/sh
+
+set -e
+
+# POSIX-compliant maint function recommend by devref
+# to check for the existence of a command
+# https://www.debian.org/doc/manuals/developers-reference/ch06.html#bpp-debian-maint-scripts
+pathfind() {
+	OLDIFS="$IFS"
+	IFS=:
+	for p in $PATH; do
+		if [ -x "$p/$*" ]; then
+		IFS="$OLDIFS"
+		return 0
+		fi
+	done
+	IFS="$OLDIFS"
+	return 1
+}
+
+case "$1" in
+	configure|reconfigure)
+		pathfind setcap && setcap \
+			cap_net_bind_service+ep /usr/bin/obfs-server
+		;;
+	abort-upgrade|abort-remove|abort-deconfigure)
+		exit 0
+		;;
+	*)
+		echo "postinst called with unknown argument \`$1'" >&2
+		exit 0
+		;;
+esac
+
+#DEBHELPER#
+
+exit 0

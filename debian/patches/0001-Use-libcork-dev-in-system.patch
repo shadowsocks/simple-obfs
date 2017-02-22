@@ -1,0 +1,48 @@
+From: Roger Shimizu <rogershimizu@gmail.com>
+Date: Tue, 21 Feb 2017 19:07:29 +0900
+Subject: Use libcork-dev in system
+
+---
+ Makefile.am     | 2 +-
+ configure.ac    | 1 -
+ src/Makefile.am | 5 ++---
+ 3 files changed, 3 insertions(+), 5 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index d5da3ab..a342e44 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -1,4 +1,4 @@
+-SUBDIRS = libcork src
++SUBDIRS = src
+ 
+ if ENABLE_DOCUMENTATION
+ SUBDIRS += doc
+diff --git a/configure.ac b/configure.ac
+index 3c03364..73d29a9 100755
+--- a/configure.ac
++++ b/configure.ac
+@@ -281,7 +281,6 @@ AM_COND_IF([ENABLE_DOCUMENTATION],
+ ])
+ 
+ AC_CONFIG_FILES([Makefile
+-                 libcork/Makefile
+                  src/Makefile])
+ 
+ AC_OUTPUT
+diff --git a/src/Makefile.am b/src/Makefile.am
+index 6d566f9..f58b41e 100644
+--- a/src/Makefile.am
++++ b/src/Makefile.am
+@@ -5,9 +5,8 @@ AM_CFLAGS += $(PTHREAD_CFLAGS)
+ AM_CFLAGS += -I$(top_srcdir)/libcork/include
+ AM_CFLAGS += $(LIBPCRE_CFLAGS)
+ 
+-OBFS_COMMON_LIBS = $(top_builddir)/libcork/libcork.la \
+-                   $(INET_NTOP_LIB) $(LIBPCRE_LIBS)
+-OBFS_COMMON_LIBS += -lev -lsodium -lm
++OBFS_COMMON_LIBS = $(INET_NTOP_LIB) $(LIBPCRE_LIBS)
++OBFS_COMMON_LIBS += -lev -lsodium -lm -lcork
+ 
+ bin_PROGRAMS = obfs-local
+ if !BUILD_WINCOMPAT

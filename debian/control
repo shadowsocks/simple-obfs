@@ -1,0 +1,22 @@
+Source: simple-obfs
+Section: net
+Priority: extra
+Maintainer: Roger Shimizu <rogershimizu@gmail.com>
+Build-Depends:
+ debhelper (>= 10),
+ libcork-dev
+Standards-Version: 3.9.8
+Homepage: https://github.com/shadowsocks/simple-obfs
+
+Package: simple-obfs
+Architecture: any
+Multi-Arch: foreign
+Depends:
+ libcap2-bin [linux-any],
+ ${misc:Depends},
+ ${shlibs:Depends}
+Description: simple obfusacting plugin for shadowsocks server
+ Simple-obfs is a simple obfusacting tool, designed as plugin server
+ of shadowsocks.
+ .
+ Please refer README.md and manpages for usage.

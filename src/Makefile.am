@@ -7,7 +7,7 @@ AM_CFLAGS += $(LIBPCRE_CFLAGS)
 
 OBFS_COMMON_LIBS = $(top_builddir)/libcork/libcork.la \
                    $(INET_NTOP_LIB) $(LIBPCRE_LIBS)
-OBFS_COMMON_LIBS += -lev -lsodium -lm
+OBFS_COMMON_LIBS += -lev -lm
 
 bin_PROGRAMS = obfs-local
 if !BUILD_WINCOMPAT

@@ -26,8 +26,6 @@
 #include "config.h"
 #endif
 
-#include <sodium.h>
-
 #ifndef __MINGW32__
 #include <arpa/inet.h>
 #endif
@@ -41,7 +39,7 @@
 static void
 dump(char *tag, char *text, int len)
 {
-    int i;
+    unsigned int i;
     printf("%s: ", tag);
     for (i = 0; i < len; i++)
         printf("0x%02x ", (uint8_t)text[i]);
@@ -52,7 +50,7 @@ dump(char *tag, char *text, int len)
 int
 balloc(buffer_t *ptr, size_t capacity)
 {
-    sodium_memzero(ptr, sizeof(buffer_t));
+    memset(ptr, 0, sizeof(buffer_t));
     ptr->data    = ss_malloc(capacity);
     ptr->capacity = capacity;
     return capacity;
@@ -87,7 +85,11 @@ bfree(buffer_t *ptr)
 int
 rand_bytes(void *output, int len)
 {
-    randombytes_buf(output, len);
+      unsigned int i;
+      int *array = (int *)output;
+      for (i = 0; i < len / sizeof(int); i++)
+
+        array[i] = rand();
     // always return success
     return 0;
 }

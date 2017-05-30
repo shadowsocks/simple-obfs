@@ -61,38 +61,6 @@ esac
 dnl Checks for TLS
 AX_TLS([:], [:])
 
-dnl Checks for crypto library
-case "${with_crypto_library}" in
-  openssl)
-    ss_ZLIB
-    ss_OPENSSL
-    AC_DEFINE([USE_CRYPTO_OPENSSL], [1], [Use OpenSSL library])
-    ;;
-  polarssl)
-    ss_POLARSSL
-    AC_DEFINE([USE_CRYPTO_POLARSSL], [1], [Use PolarSSL library])
-    ;;
-  mbedtls)
-    ss_MBEDTLS
-    AC_DEFINE([USE_CRYPTO_MBEDTLS], [1], [Use mbed TLS library])
-    ;;
-esac
-
-dnl Checks for Apple CommonCrypto API
-AC_ARG_ENABLE(applecc,
-  AS_HELP_STRING([--enable-applecc], [enable Apple CommonCrypto API support]),
-  [
-    AC_CHECK_HEADERS(CommonCrypto/CommonCrypto.h,
-      [],
-      [AC_MSG_ERROR([CommonCrypto header files not found.]); break]
-    )
-    AC_CHECK_FUNCS([CCCryptorCreateWithMode], ,
-      [AC_MSG_ERROR([CommonCrypto API needs OS X (>= 10.7) and iOS (>= 5.0).]); break]
-    )
-    AC_DEFINE([USE_CRYPTO_APPLECC], [1], [Use Apple CommonCrypto library])
-  ]
-)
-
 dnl Checks for inet_ntop
 ss_FUNC_INET_NTOP
 
@@ -267,10 +235,6 @@ AC_CHECK_LIB(socket, connect)
 
 dnl Checks for library functions.
 AC_CHECK_FUNCS([malloc memset socket])
-
-AC_CHECK_LIB([sodium], [sodium_init], [LIBS="-lsodium $LIBS"], [
-   AC_MSG_ERROR([Couldn't find libsodium. Try installing libsodium-dev@<:@el@:>@.])
-])
 
 AC_CHECK_LIB([udns], [dns_dnlen], [LIBS="-ludns $LIBS"], [AC_MSG_ERROR([Couldn't find libudns. Try installing libudns-dev or udns-devel.])])
 

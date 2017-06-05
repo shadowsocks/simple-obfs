@@ -39,7 +39,7 @@
 static void
 dump(char *tag, char *text, int len)
 {
-    int i;
+    unsigned int i;
     printf("%s: ", tag);
     for (i = 0; i < len; i++)
         printf("0x%02x ", (uint8_t)text[i]);
@@ -85,6 +85,7 @@ bfree(buffer_t *ptr)
 int
 rand_bytes(void *output, int len)
 {
+
     int i;
     int *array = (int *)output;
     for (i = 0; i < len / sizeof(int); i++)

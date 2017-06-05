@@ -85,10 +85,10 @@ bfree(buffer_t *ptr)
 int
 rand_bytes(void *output, int len)
 {
-      unsigned int i;
-      int *array = (int *)output;
-      for (i = 0; i < len / sizeof(int); i++)
 
+    int i;
+    int *array = (int *)output;
+    for (i = 0; i < len / sizeof(int); i++)
         array[i] = rand();
     // always return success
     return 0;

@@ -396,6 +396,12 @@ connect_to_remote(EV_P_ struct addrinfo *res,
 static void
 perform_handshake(EV_P_ server_t *server)
 {
+    // Copy back the saved first packet
+    server->buf->len = server->header_buf->len;
+    server->buf->idx = server->header_buf->idx;
+    memcpy(server->buf->data, server->header_buf->data, server->header_buf->len);
+    server->header_buf->idx = server->header_buf->len = 0;
+
     int need_query = 0;
     struct addrinfo info;
     struct sockaddr_storage storage;
@@ -561,6 +567,10 @@ server_recv_cb(EV_P_ ev_io *w, int revents)
         }
 
         server->stage = STAGE_HANDSHAKE;
+        // Copy the first packet to the currently unused header_buf.
+        server->header_buf->len = server->buf->len - server->buf->idx;
+        server->header_buf->idx = 0;
+        memcpy(server->header_buf->data, server->buf->data + server->buf->idx, server->header_buf->len);
         if (obfs_para->send_empty_response_upon_connection) {
             // Clear the buffer to make an empty packet.
             server->buf->len = 0;
@@ -589,10 +599,11 @@ server_recv_cb(EV_P_ ev_io *w, int revents)
                 ev_io_start(EV_A_ & server->send_ctx->io);
                 return;
             } else {
-                server->buf->idx = 0;
                 server->buf->len = 0;
+                server->buf->idx = 0;
             }
         }
+
         perform_handshake(EV_A_ server);
         return;
     } else {

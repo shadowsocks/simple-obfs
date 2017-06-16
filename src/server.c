@@ -477,7 +477,6 @@ perform_handshake(EV_P_ server_t *server)
             }
 
             // waiting on remote connected event
-            ev_io_stop(EV_A_ & server->recv_ctx->io);
             ev_io_start(EV_A_ & remote->send_ctx->io);
         }
     } else {
@@ -490,7 +489,6 @@ perform_handshake(EV_P_ server_t *server)
         server->query = resolv_query(host, server_resolve_cb,
                                         query_free_cb, query, port);
 
-        ev_io_stop(EV_A_ & server->recv_ctx->io);
     }
 
     return;
@@ -567,6 +565,8 @@ server_recv_cb(EV_P_ ev_io *w, int revents)
         }
 
         server->stage = STAGE_HANDSHAKE;
+        ev_io_stop(EV_A_ & server->recv_ctx->io);
+
         // Copy the first packet to the currently unused header_buf.
         server->header_buf->len = server->buf->len - server->buf->idx;
         server->header_buf->idx = 0;

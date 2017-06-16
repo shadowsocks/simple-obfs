@@ -62,6 +62,8 @@ static int next_header(const char **, int *);
 static obfs_para_t obfs_http_st = {
     .name            = "http",
     .port            = 80,
+    .send_empty_response_upon_connection = true,
+
     .obfs_request    = &obfs_http_request,
     .obfs_response   = &obfs_http_response,
     .deobfs_request  = &deobfs_http_header,
@@ -165,7 +167,8 @@ deobfs_http_header(buffer_t *buf, size_t cap, obfs_t *obfs)
     int len    = buf->len;
     int err    = -1;
 
-    while (len > 4) {
+    // Allow empty content
+    while (len >= 4) {
         if (data[0] == '\r' && data[1] == '\n'
             && data[2] == '\r' && data[3] == '\n') {
             len  -= 4;

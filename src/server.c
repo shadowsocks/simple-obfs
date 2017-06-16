@@ -89,6 +89,7 @@ static void remote_recv_cb(EV_P_ ev_io *w, int revents);
 static void remote_send_cb(EV_P_ ev_io *w, int revents);
 static void server_timeout_cb(EV_P_ ev_timer *watcher, int revents);
 
+static void perform_handshake(EV_P_ server_t *server);
 static remote_t *new_remote(int fd);
 static server_t *new_server(int fd, listen_ctx_t *listener);
 static remote_t *connect_to_remote(EV_P_ struct addrinfo *res,
@@ -393,6 +394,103 @@ connect_to_remote(EV_P_ struct addrinfo *res,
 }
 
 static void
+perform_handshake(EV_P_ server_t *server)
+{
+    int need_query = 0;
+    struct addrinfo info;
+    struct sockaddr_storage storage;
+    memset(&info, 0, sizeof(struct addrinfo));
+    memset(&storage, 0, sizeof(struct sockaddr_storage));
+
+    // Domain name
+    size_t name_len = strlen(server->listen_ctx->dst_addr->host);
+    char *host = server->listen_ctx->dst_addr->host;
+    uint16_t port = htons((uint16_t)atoi(server->listen_ctx->dst_addr->port));
+
+    if (obfs_para == NULL || !obfs_para->is_enable(server->obfs)) {
+        if (server->listen_ctx->failover->host != NULL
+                && server->listen_ctx->failover->port != NULL) {
+            name_len = strlen(server->listen_ctx->failover->host);
+            host = server->listen_ctx->failover->host;
+            port = htons((uint16_t)atoi(server->listen_ctx->failover->port));
+        }
+    }
+
+    struct cork_ip ip;
+    if (cork_ip_init(&ip, host) != -1) {
+        info.ai_socktype = SOCK_STREAM;
+        info.ai_protocol = IPPROTO_TCP;
+        if (ip.version == 4) {
+            struct sockaddr_in *addr = (struct sockaddr_in *)&storage;
+            dns_pton(AF_INET, host, &(addr->sin_addr));
+            addr->sin_port   = port;
+            addr->sin_family = AF_INET;
+            info.ai_family   = AF_INET;
+            info.ai_addrlen  = sizeof(struct sockaddr_in);
+            info.ai_addr     = (struct sockaddr *)addr;
+        } else if (ip.version == 6) {
+            struct sockaddr_in6 *addr = (struct sockaddr_in6 *)&storage;
+            dns_pton(AF_INET6, host, &(addr->sin6_addr));
+            addr->sin6_port   = port;
+            addr->sin6_family = AF_INET6;
+            info.ai_family    = AF_INET6;
+            info.ai_addrlen   = sizeof(struct sockaddr_in6);
+            info.ai_addr      = (struct sockaddr *)addr;
+        }
+    } else {
+        if (!validate_hostname(host, name_len)) {
+            LOGE("invalid host name");
+            close_and_free_server(EV_A_ server);
+            return;
+        }
+        need_query = 1;
+    }
+
+    if (verbose) {
+        LOGI("connect to %s:%d", host, ntohs(port));
+    }
+
+    if (!need_query) {
+        remote_t *remote = connect_to_remote(EV_A_ & info, server);
+
+        if (remote == NULL) {
+            LOGE("connect error");
+            close_and_free_server(EV_A_ server);
+            return;
+        } else {
+            server->remote = remote;
+            remote->server = server;
+
+            // XXX: should handle buffer carefully
+            if (server->buf->len > 0) {
+                memcpy(remote->buf->data, server->buf->data, server->buf->len);
+                remote->buf->len = server->buf->len;
+                remote->buf->idx = 0;
+                server->buf->len = 0;
+                server->buf->idx = 0;
+            }
+
+            // waiting on remote connected event
+            ev_io_stop(EV_A_ & server->recv_ctx->io);
+            ev_io_start(EV_A_ & remote->send_ctx->io);
+        }
+    } else {
+        query_t *query = ss_malloc(sizeof(query_t));
+        memset(query, 0, sizeof(query_t));
+        query->server = server;
+        snprintf(query->hostname, 256, "%s", host);
+
+        server->stage = STAGE_RESOLVE;
+        server->query = resolv_query(host, server_resolve_cb,
+                                        query_free_cb, query, port);
+
+        ev_io_stop(EV_A_ & server->recv_ctx->io);
+    }
+
+    return;
+}
+
+static void
 server_recv_cb(EV_P_ ev_io *w, int revents)
 {
     server_ctx_t *server_recv_ctx = (server_ctx_t *)w;
@@ -461,7 +559,42 @@ server_recv_cb(EV_P_ ev_io *w, int revents)
                 obfs_para->disable(server->obfs);
             }
         }
+
         server->stage = STAGE_HANDSHAKE;
+        if (obfs_para->send_empty_response_upon_connection) {
+            // Clear the buffer to make an empty packet.
+            server->buf->len = 0;
+
+            if (obfs_para) {
+                obfs_para->obfs_response(server->buf, BUF_SIZE, server->obfs);
+            }
+
+            int s = send(server->fd, server->buf->data, server->buf->len, 0);
+
+            if (s == -1) {
+                if (errno == EAGAIN || errno == EWOULDBLOCK) {
+                    // no data, wait for send
+                    server->buf->idx = 0;
+                    ev_io_start(EV_A_ & server->send_ctx->io);
+                    return;
+                } else {
+                    ERROR("send_inital_response");
+                    close_and_free_remote(EV_A_ remote);
+                    close_and_free_server(EV_A_ server);
+                    return;
+                }
+            } else if (s < server->buf->len) {
+                server->buf->len -= s;
+                server->buf->idx  = s;
+                ev_io_start(EV_A_ & server->send_ctx->io);
+                return;
+            } else {
+                server->buf->idx = 0;
+                server->buf->len = 0;
+            }
+        }
+        perform_handshake(EV_A_ server);
+        return;
     } else {
         buf->len = r;
         if (obfs_para) {
@@ -493,101 +626,7 @@ server_recv_cb(EV_P_ ev_io *w, int revents)
         }
         return;
 
-    } else if (server->stage == STAGE_HANDSHAKE) {
-
-        int need_query = 0;
-        struct addrinfo info;
-        struct sockaddr_storage storage;
-        memset(&info, 0, sizeof(struct addrinfo));
-        memset(&storage, 0, sizeof(struct sockaddr_storage));
-
-        // Domain name
-        size_t name_len = strlen(server->listen_ctx->dst_addr->host);
-        char *host = server->listen_ctx->dst_addr->host;
-        uint16_t port = htons((uint16_t)atoi(server->listen_ctx->dst_addr->port));
-
-        if (obfs_para == NULL || !obfs_para->is_enable(server->obfs)) {
-            if (server->listen_ctx->failover->host != NULL
-                    && server->listen_ctx->failover->port != NULL) {
-                name_len = strlen(server->listen_ctx->failover->host);
-                host = server->listen_ctx->failover->host;
-                port = htons((uint16_t)atoi(server->listen_ctx->failover->port));
-            }
-        }
-
-        struct cork_ip ip;
-        if (cork_ip_init(&ip, host) != -1) {
-            info.ai_socktype = SOCK_STREAM;
-            info.ai_protocol = IPPROTO_TCP;
-            if (ip.version == 4) {
-                struct sockaddr_in *addr = (struct sockaddr_in *)&storage;
-                dns_pton(AF_INET, host, &(addr->sin_addr));
-                addr->sin_port   = port;
-                addr->sin_family = AF_INET;
-                info.ai_family   = AF_INET;
-                info.ai_addrlen  = sizeof(struct sockaddr_in);
-                info.ai_addr     = (struct sockaddr *)addr;
-            } else if (ip.version == 6) {
-                struct sockaddr_in6 *addr = (struct sockaddr_in6 *)&storage;
-                dns_pton(AF_INET6, host, &(addr->sin6_addr));
-                addr->sin6_port   = port;
-                addr->sin6_family = AF_INET6;
-                info.ai_family    = AF_INET6;
-                info.ai_addrlen   = sizeof(struct sockaddr_in6);
-                info.ai_addr      = (struct sockaddr *)addr;
-            }
-        } else {
-            if (!validate_hostname(host, name_len)) {
-                LOGE("invalid host name");
-                close_and_free_server(EV_A_ server);
-                return;
-            }
-            need_query = 1;
-        }
-
-        if (verbose) {
-            LOGI("connect to %s:%d", host, ntohs(port));
-        }
-
-        if (!need_query) {
-            remote_t *remote = connect_to_remote(EV_A_ & info, server);
-
-            if (remote == NULL) {
-                LOGE("connect error");
-                close_and_free_server(EV_A_ server);
-                return;
-            } else {
-                server->remote = remote;
-                remote->server = server;
-
-                // XXX: should handle buffer carefully
-                if (server->buf->len > 0) {
-                    memcpy(remote->buf->data, server->buf->data, server->buf->len);
-                    remote->buf->len = server->buf->len;
-                    remote->buf->idx = 0;
-                    server->buf->len = 0;
-                    server->buf->idx = 0;
-                }
-
-                // waiting on remote connected event
-                ev_io_stop(EV_A_ & server_recv_ctx->io);
-                ev_io_start(EV_A_ & remote->send_ctx->io);
-            }
-        } else {
-            query_t *query = ss_malloc(sizeof(query_t));
-            memset(query, 0, sizeof(query_t));
-            query->server = server;
-            snprintf(query->hostname, 256, "%s", host);
-
-            server->stage = STAGE_RESOLVE;
-            server->query = resolv_query(host, server_resolve_cb,
-                                         query_free_cb, query, port);
-
-            ev_io_stop(EV_A_ & server_recv_ctx->io);
-        }
-
-        return;
-    }
+    } 
     // should not reach here
     FATAL("server context error");
 }
@@ -634,14 +673,21 @@ server_send_cb(EV_P_ ev_io *w, int revents)
             server->buf->len = 0;
             server->buf->idx = 0;
             ev_io_stop(EV_A_ & server_send_ctx->io);
-            if (remote != NULL) {
-                ev_io_start(EV_A_ & remote->recv_ctx->io);
+
+            // If handshaking
+            if (server->stage == STAGE_HANDSHAKE) {
+                perform_handshake(EV_A_ server);
                 return;
-            } else {
-                LOGE("invalid remote");
-                close_and_free_remote(EV_A_ remote);
-                close_and_free_server(EV_A_ server);
-                return;
+            } else { // If streaming
+                if (remote != NULL) {
+                    ev_io_start(EV_A_ & remote->recv_ctx->io);
+                    return;
+                } else {
+                    LOGE("invalid remote");
+                    close_and_free_remote(EV_A_ remote);
+                    close_and_free_server(EV_A_ server);
+                    return;
+                }
             }
         }
     }

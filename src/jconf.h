@@ -58,6 +58,7 @@ typedef struct {
     char *dst_addr;
     int mptcp;
     int ipv6_first;
+    int reverse_proxy;
 } jconf_t;
 
 jconf_t *read_jconf(const char *file);

@@ -105,6 +105,7 @@ static void query_free_cb(void *data);
 int verbose = 0;
 
 static int ipv6first = 0;
+static int reverse_proxy = 0;
 static int fast_open = 0;
 
 static obfs_para_t *obfs_para = NULL;
@@ -571,7 +572,7 @@ server_recv_cb(EV_P_ ev_io *w, int revents)
         server->header_buf->len = server->buf->len - server->buf->idx;
         server->header_buf->idx = 0;
         memcpy(server->header_buf->data, server->buf->data + server->buf->idx, server->header_buf->len);
-        if (obfs_para->send_empty_response_upon_connection) {
+        if (reverse_proxy && obfs_para->send_empty_response_upon_connection) {
             // Clear the buffer to make an empty packet.
             server->buf->len = 0;
 
@@ -1237,6 +1238,8 @@ main(int argc, char **argv)
                     obfs_host = value;
                 } else if (strcmp(key, "failover") == 0) {
                     failover_str = value;
+                } else if (strcmp(key, "reverse_proxy") == 0) {
+                    reverse_proxy = 1;
 #ifdef __linux__
                 } else if (strcmp(key, "mptcp") == 0) {
                     mptcp = 1;
@@ -1257,6 +1260,7 @@ main(int argc, char **argv)
 #ifdef __linux__
         { "mptcp",           no_argument,       0, 0 },
 #endif
+        { "reverse_proxy",   no_argument,       0, 0 },
         { 0,                 0,                 0, 0 }
     };
 
@@ -1285,6 +1289,9 @@ main(int argc, char **argv)
             } else if (option_index == 5) {
                 mptcp = 1;
                 LOGI("enable multipath TCP");
+            } else if (option_index == 6) {
+                reverse_proxy = 1;
+                LOGI("enable reverse proxy");
             }
             break;
         case 's':
@@ -1398,6 +1405,9 @@ main(int argc, char **argv)
         }
         if (ipv6first == 0) {
             ipv6first = conf->ipv6_first;
+        }
+        if (reverse_proxy == 0) {
+            reverse_proxy = conf->reverse_proxy;
         }
     }
 

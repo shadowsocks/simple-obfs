@@ -206,6 +206,10 @@ read_jconf(const char *file)
                 check_json_value_type(value, json_boolean,
                     "invalid config file: option 'ipv6_first' must be a boolean");
                 conf.ipv6_first = value->u.boolean;
+            } else if (strcmp(name, "reverse_proxy") == 0) {
+                check_json_value_type(value, json_boolean,
+                    "invalid config file: option 'reverse_proxy' must be a boolean");
+                conf.reverse_proxy = value->u.boolean;
             }
         }
     } else {

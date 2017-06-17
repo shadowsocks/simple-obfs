@@ -38,6 +38,7 @@ static const char *http_request_template =
     "Upgrade: websocket\r\n"
     "Connection: Upgrade\r\n"
     "Sec-WebSocket-Key: %s\r\n"
+    "Content-Length: %lu\r\n"
     "\r\n";
 
 static const char *http_response_template =
@@ -62,6 +63,8 @@ static int next_header(const char **, int *);
 static obfs_para_t obfs_http_st = {
     .name            = "http",
     .port            = 80,
+    .send_empty_response_upon_connection = true,
+
     .obfs_request    = &obfs_http_request,
     .obfs_response   = &obfs_http_response,
     .deobfs_request  = &deobfs_http_header,
@@ -101,7 +104,7 @@ obfs_http_request(buffer_t *buf, size_t cap, obfs_t *obfs)
 
     size_t obfs_len =
         snprintf(http_header, sizeof(http_header), http_request_template,
-                 host_port, major_version, minor_version, b64);
+                 host_port, major_version, minor_version, b64, buf->len);
     size_t buf_len = buf->len;
 
     brealloc(buf, obfs_len + buf_len, cap);
@@ -165,7 +168,8 @@ deobfs_http_header(buffer_t *buf, size_t cap, obfs_t *obfs)
     int len    = buf->len;
     int err    = -1;
 
-    while (len > 4) {
+    // Allow empty content
+    while (len >= 4) {
         if (data[0] == '\r' && data[1] == '\n'
             && data[2] == '\r' && data[3] == '\n') {
             len  -= 4;

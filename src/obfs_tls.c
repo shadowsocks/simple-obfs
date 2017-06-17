@@ -177,6 +177,8 @@ static int is_enable_tls(obfs_t *obfs);
 static obfs_para_t obfs_tls_st = {
     .name            = "tls",
     .port            = 443,
+    .send_empty_response_upon_connection = false,
+
     .obfs_request    = &obfs_tls_request,
     .obfs_response   = &obfs_tls_response,
     .deobfs_request  = &deobfs_tls_request,

@@ -74,7 +74,7 @@
 #endif
 
 #ifndef BUF_SIZE
-#define BUF_SIZE 2048
+#define BUF_SIZE 16384
 #endif
 
 #ifndef SSMAXCONN

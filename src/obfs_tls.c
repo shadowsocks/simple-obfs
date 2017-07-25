@@ -231,6 +231,9 @@ deobfs_app_data(buffer_t *buf, size_t idx, obfs_t *obfs)
             continue;
         }
 
+        if (frame->len > 16384)
+            return OBFS_ERROR;
+
         int left_len = buf->len - bidx;
 
         if (left_len > frame->len) {

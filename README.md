@@ -2,8 +2,7 @@
 
 ## Intro
 
-Simple-obfs is a simple obfusacting tool, designed
-as plugin server of shadowsocks.
+Simple-obfs is a simple obfusacting tool, designed as plugin server of shadowsocks.
 
 Current version: 0.0.3 | [Changelog](Changes)
 
@@ -83,6 +82,7 @@ obfs-server -s server_ip -p 443 --obfs tls -r 127.0.0.1:8388 --failover 127.0.0.
 
 ## License
 
+```
 Copyright (C) 2016 Max Lv <max.c.lv@gmail.com>
 
 This program is free software: you can redistribute it and/or modify
@@ -97,3 +97,4 @@ GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
+```

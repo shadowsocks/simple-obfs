@@ -23,7 +23,6 @@
 #include <math.h>
 
 #include <libcork/core.h>
-#include <udns.h>
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -34,6 +33,7 @@
 #define sleep(n) Sleep(1000 * (n))
 #else
 #include <sys/socket.h>
+#include <arpa/inet.h>
 #include <netdb.h>
 #include <netinet/in.h>
 #include <unistd.h>
@@ -103,12 +103,12 @@ bind_to_address(int socket_fd, const char *host)
         if (cork_ip_init(&ip, host) != -1) {
             if (ip.version == 4) {
                 struct sockaddr_in *addr = (struct sockaddr_in *)&storage;
-                dns_pton(AF_INET, host, &addr->sin_addr);
+                inet_pton(AF_INET, host, &addr->sin_addr);
                 addr->sin_family = AF_INET;
                 return bind(socket_fd, (struct sockaddr *)addr, sizeof(struct sockaddr_in));
             } else if (ip.version == 6) {
                 struct sockaddr_in6 *addr = (struct sockaddr_in6 *)&storage;
-                dns_pton(AF_INET6, host, &addr->sin6_addr);
+                inet_pton(AF_INET6, host, &addr->sin6_addr);
                 addr->sin6_family = AF_INET6;
                 return bind(socket_fd, (struct sockaddr *)addr, sizeof(struct sockaddr_in6));
             }
@@ -127,14 +127,14 @@ get_sockaddr(char *host, char *port,
         if (ip.version == 4) {
             struct sockaddr_in *addr = (struct sockaddr_in *)storage;
             addr->sin_family = AF_INET;
-            dns_pton(AF_INET, host, &(addr->sin_addr));
+            inet_pton(AF_INET, host, &(addr->sin_addr));
             if (port != NULL) {
                 addr->sin_port = htons(atoi(port));
             }
         } else if (ip.version == 6) {
             struct sockaddr_in6 *addr = (struct sockaddr_in6 *)storage;
             addr->sin6_family = AF_INET6;
-            dns_pton(AF_INET6, host, &(addr->sin6_addr));
+            inet_pton(AF_INET6, host, &(addr->sin6_addr));
             if (port != NULL) {
                 addr->sin6_port = htons(atoi(port));
             }

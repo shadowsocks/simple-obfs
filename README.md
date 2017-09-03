@@ -12,7 +12,7 @@ e.g. Ubuntu, Debian or Linux Mint, you can build the binary like this:
 
 ```bash
 # Debian / Ubuntu
-sudo apt-get install --no-install-recommends build-essential autoconf libtool libssl-dev libpcre3-dev libudns-dev libev-dev asciidoc xmlto automake
+sudo apt-get install --no-install-recommends build-essential autoconf libtool libssl-dev libpcre3-dev libc-ares-dev libev-dev asciidoc xmlto automake
 # CentOS / Fedora / RHEL
 sudo yum install gcc autoconf libtool automake make zlib-devel openssl-devel asciidoc xmlto
 # Arch

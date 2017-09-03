@@ -49,7 +49,6 @@
 #endif
 
 #include <libcork/core.h>
-#include <udns.h>
 
 #ifdef __MINGW32__
 #include "win32.h"

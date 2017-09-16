@@ -23,7 +23,8 @@ prepare() {
 build() {
 	cd "$builddir"
 	./autogen.sh
-	./configure                       
+	./configure \
+        --disable-documentation
 	make                                                
 }
 

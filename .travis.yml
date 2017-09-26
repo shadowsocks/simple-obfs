@@ -3,7 +3,7 @@
   "language": "c",
   "dist": "trusty",
   "before_script": [
-    "sudo apt-get install --no-install-recommends -y build-essential autoconf libtool libssl-dev libpcre3-dev libudns-dev libev-dev asciidoc xmlto automake",
+    "sudo apt-get install --no-install-recommends -y build-essential autoconf libtool libssl-dev libpcre3-dev libc-ares-dev libev-dev asciidoc xmlto automake",
     "git submodule update --init --recursive",
     "chmod +x *.sh",
     "./autogen.sh",

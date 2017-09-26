@@ -38,8 +38,8 @@ obfs_server_SOURCES = utils.c \
 
 obfs_local_LDADD = $(OBFS_COMMON_LIBS)
 obfs_server_LDADD = $(OBFS_COMMON_LIBS)
-obfs_local_LDADD += -ludns
-obfs_server_LDADD += -ludns
+obfs_local_LDADD += -lcares
+obfs_server_LDADD += -lcares
 
 obfs_local_CFLAGS = $(AM_CFLAGS) -DMODULE_LOCAL
 obfs_server_CFLAGS = $(AM_CFLAGS) -DMODULE_REMOTE

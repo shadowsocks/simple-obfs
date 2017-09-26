@@ -40,9 +40,9 @@ index 6d566f9..f58b41e 100644
  
 -OBFS_COMMON_LIBS = $(top_builddir)/libcork/libcork.la \
 -                   $(INET_NTOP_LIB) $(LIBPCRE_LIBS)
--OBFS_COMMON_LIBS += -lev -lsodium -lm
+-OBFS_COMMON_LIBS += -lev -lm
 +OBFS_COMMON_LIBS = $(INET_NTOP_LIB) $(LIBPCRE_LIBS)
-+OBFS_COMMON_LIBS += -lev -lsodium -lm -lcork
++OBFS_COMMON_LIBS += -lev -lm -lcork
  
  bin_PROGRAMS = obfs-local
  if !BUILD_WINCOMPAT

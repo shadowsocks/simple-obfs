@@ -1,11 +1,18 @@
-simple-obfs (0.0.2-1) unstable; urgency=medium
+simple-obfs (0.0.4-1) unstable; urgency=medium
 
-  * Refine SIP003 interfaces.
+  * Minor bug fixes.
 
- -- Max Lv <max.c.lv@gmail.com>  Mon, 16 Jan 2017 10:53:34 +0800
+ -- Max Lv <max.c.lv@gmail.com>  Mon, 06 Nov 2017 14:52:48 +0800
 
-simple-obfs (0.0.1-1) unstable; urgency=medium
+simple-obfs (0.0.3-1) unstable; urgency=medium
 
-  * Add HTTP/TLS obfuscating.
+  * Add failover option.
+  * Minor bug fixes.
 
- -- Max Lv <max.c.lv@gmail.com>  Sat, 31 Dec 2016 18:37:12 +0800
+ -- Max Lv <max.c.lv@gmail.com>  Fri, 17 Mar 2017 17:02:43 +0800
+
+simple-obfs (0.0.2-1) UNRELEASED; urgency=low
+
+  * Initial release. (Closes: #)
+
+ -- Roger Shimizu <rogershimizu@gmail.com>  Wed, 22 Feb 2017 21:55:18 +0900

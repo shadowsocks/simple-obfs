@@ -1,7 +1,7 @@
 # Contributor: Max Lv <max.c.lv@gmail.com>
 # Maintainer: Max Lv <max.c.lv@gmail.com>
 pkgname=simple-obfs
-pkgver=0.0.3
+pkgver=0.0.4
 pkgrel=0
 pkgdesc="Simple-obfs is a simple obfusacting tool, designed as plugin server of shadowsocks."
 url="https://github.com/shadowsocks/simple-obfs"

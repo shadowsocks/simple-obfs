@@ -98,8 +98,6 @@ static void free_remote(remote_t *remote);
 static void close_and_free_remote(EV_P_ remote_t *remote);
 static void free_server(server_t *server);
 static void close_and_free_server(EV_P_ server_t *server);
-static void resolv_cb(struct sockaddr *addr, void *data);
-static void resolv_free_cb(void *data);
 
 int verbose = 0;
 
@@ -402,7 +400,6 @@ perform_handshake(EV_P_ server_t *server)
     memcpy(server->buf->data, server->header_buf->data, server->header_buf->len);
     server->header_buf->idx = server->header_buf->len = 0;
 
-    int need_query = 0;
     struct addrinfo info;
     struct sockaddr_storage storage;
     memset(&info, 0, sizeof(struct addrinfo));
@@ -449,54 +446,41 @@ perform_handshake(EV_P_ server_t *server)
             close_and_free_server(EV_A_ server);
             return;
         }
-        need_query = 1;
+        char tmp_port[16];
+        snprintf(tmp_port, 16, "%d", ntohs(port));
+        memset(&storage, 0, sizeof(struct sockaddr_storage));
+        if (get_sockaddr(host, tmp_port, &storage, 0, 1) == -1) {
+            LOGE("failed to resolve the provided hostname");
+            close_and_free_server(EV_A_ server);
+            return;
+        }
     }
 
     if (verbose) {
         LOGI("connect to %s:%d", host, ntohs(port));
     }
 
-    if (!need_query) {
-        remote_t *remote = connect_to_remote(EV_A_ & info, server);
+    remote_t *remote = connect_to_remote(EV_A_ & info, server);
 
-        if (remote == NULL) {
-            LOGE("connect error");
-            close_and_free_server(EV_A_ server);
-            return;
-        } else {
-            server->remote = remote;
-            remote->server = server;
-
-            // XXX: should handle buffer carefully
-            if (server->buf->len > 0) {
-                memcpy(remote->buf->data, server->buf->data, server->buf->len);
-                remote->buf->len = server->buf->len;
-                remote->buf->idx = 0;
-                server->buf->len = 0;
-                server->buf->idx = 0;
-            }
-
-            // waiting on remote connected event
-            ev_io_start(EV_A_ & remote->send_ctx->io);
-        }
+    if (remote == NULL) {
+        LOGE("connect error");
+        close_and_free_server(EV_A_ server);
+        return;
     } else {
-        query_t *query = ss_malloc(sizeof(query_t));
-        memset(query, 0, sizeof(query_t));
-        query->server = server;
-        server->query = query;
-        snprintf(query->hostname, 256, "%s", host);
+        server->remote = remote;
+        remote->server = server;
 
-        server->stage = STAGE_RESOLVE;
-            struct resolv_query *q = resolv_start(host, port,
-                    resolv_cb, resolv_free_cb, query);
+        // XXX: should handle buffer carefully
+        if (server->buf->len > 0) {
+            memcpy(remote->buf->data, server->buf->data, server->buf->len);
+            remote->buf->len = server->buf->len;
+            remote->buf->idx = 0;
+            server->buf->len = 0;
+            server->buf->idx = 0;
+        }
 
-            if (q == NULL) {
-                if (query != NULL) ss_free(query);
-                server->query = NULL;
-                close_and_free_server(EV_A_ server);
-                return;
-            }
-
+        // waiting on remote connected event
+        ev_io_start(EV_A_ & remote->send_ctx->io);
     }
 
     return;
@@ -645,7 +629,7 @@ server_recv_cb(EV_P_ ev_io *w, int revents)
         }
         return;
 
-    } 
+    }
     // should not reach here
     FATAL("server context error");
 }
@@ -726,73 +710,6 @@ server_timeout_cb(EV_P_ ev_timer *watcher, int revents)
 
     close_and_free_remote(EV_A_ remote);
     close_and_free_server(EV_A_ server);
-}
-
-static void
-resolv_free_cb(void *data)
-{
-    query_t *query = (query_t *)data;
-
-    if (query != NULL) {
-        if (query->server != NULL)
-            query->server->query = NULL;
-        ss_free(query);
-    }
-}
-
-static void
-resolv_cb(struct sockaddr *addr, void *data)
-{
-    query_t *query       = (query_t *)data;
-    server_t *server     = query->server;
-    if (server == NULL) return;
-
-    struct ev_loop *loop = server->listen_ctx->loop;
-
-    if (addr == NULL) {
-        LOGE("unable to resolve %s", query->hostname);
-        close_and_free_server(EV_A_ server);
-    } else {
-        if (verbose) {
-            LOGI("successfully resolved %s", query->hostname);
-        }
-
-        struct addrinfo info;
-        memset(&info, 0, sizeof(struct addrinfo));
-        info.ai_socktype = SOCK_STREAM;
-        info.ai_protocol = IPPROTO_TCP;
-        info.ai_addr     = addr;
-
-        if (addr->sa_family == AF_INET) {
-            info.ai_family  = AF_INET;
-            info.ai_addrlen = sizeof(struct sockaddr_in);
-        } else if (addr->sa_family == AF_INET6) {
-            info.ai_family  = AF_INET6;
-            info.ai_addrlen = sizeof(struct sockaddr_in6);
-        }
-
-        remote_t *remote = connect_to_remote(EV_A_ & info, server);
-
-        if (remote == NULL) {
-            close_and_free_server(EV_A_ server);
-        } else {
-            server->remote = remote;
-            remote->server = server;
-
-            // XXX: should handle buffer carefully
-            if (server->buf->len > 0) {
-                memcpy(remote->buf->data, server->buf->data + server->buf->idx,
-                       server->buf->len);
-                remote->buf->len = server->buf->len;
-                remote->buf->idx = 0;
-                server->buf->len = 0;
-                server->buf->idx = 0;
-            }
-
-            // listen to remote connected event
-            ev_io_start(EV_A_ & remote->send_ctx->io);
-        }
-    }
 }
 
 static void
@@ -1042,7 +959,6 @@ new_server(int fd, listen_ctx_t *listener)
     server->send_ctx->server    = server;
     server->send_ctx->connected = 0;
     server->stage               = STAGE_INIT;
-    server->query               = NULL;
     server->listen_ctx          = listener;
     server->remote              = NULL;
 
@@ -1096,10 +1012,6 @@ static void
 close_and_free_server(EV_P_ server_t *server)
 {
     if (server != NULL) {
-        if (server->query != NULL) {
-            server->query->server = NULL;
-            server->query = NULL;
-        }
         ev_io_stop(EV_A_ & server->send_ctx->io);
         ev_io_stop(EV_A_ & server->recv_ctx->io);
         ev_timer_stop(EV_A_ & server->recv_ctx->watcher);
@@ -1503,14 +1415,6 @@ main(int argc, char **argv)
     // initialize ev loop
     struct ev_loop *loop = EV_DEFAULT;
 
-    // setup udns
-#ifdef __MINGW32__
-        nameservers[nameserver_num++] = "8.8.8.8";
-        resolv_init(loop, nameservers, nameserver_num, ipv6first);
-#else
-        resolv_init(loop, nameservers, ipv6first);
-#endif
-
     if (nameservers != NULL)
         LOGI("using nameserver: %s", nameservers);
 
@@ -1579,9 +1483,6 @@ main(int argc, char **argv)
     }
 
     // Clean up
-
-    resolv_shutdown(loop);
-
     for (int i = 0; i <= server_num; i++) {
         listen_ctx_t *listen_ctx = &listen_ctx_list[i];
         ev_io_stop(loop, &listen_ctx->io);

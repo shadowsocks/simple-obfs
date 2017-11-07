@@ -29,7 +29,6 @@
 
 #include "encrypt.h"
 #include "jconf.h"
-#include "resolv.h"
 
 #include "common.h"
 
@@ -51,8 +50,6 @@ typedef struct server_ctx {
     struct server *server;
 } server_ctx_t;
 
-struct query;
-
 typedef struct server {
     int fd;
     int stage;
@@ -68,15 +65,8 @@ typedef struct server {
     struct listen_ctx *listen_ctx;
     struct remote *remote;
 
-    struct query *query;
-
     struct cork_dllist_item entries;
 } server_t;
-
-typedef struct query {
-    server_t *server;
-    char hostname[257];
-} query_t;
 
 typedef struct remote_ctx {
     ev_io io;

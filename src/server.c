@@ -421,24 +421,16 @@ perform_handshake(EV_P_ server_t *server)
 
     struct cork_ip ip;
     if (cork_ip_init(&ip, host) != -1) {
-        info.ai_socktype = SOCK_STREAM;
-        info.ai_protocol = IPPROTO_TCP;
         if (ip.version == 4) {
             struct sockaddr_in *addr = (struct sockaddr_in *)&storage;
             inet_pton(AF_INET, host, &(addr->sin_addr));
             addr->sin_port   = port;
             addr->sin_family = AF_INET;
-            info.ai_family   = AF_INET;
-            info.ai_addrlen  = sizeof(struct sockaddr_in);
-            info.ai_addr     = (struct sockaddr *)addr;
         } else if (ip.version == 6) {
             struct sockaddr_in6 *addr = (struct sockaddr_in6 *)&storage;
             inet_pton(AF_INET6, host, &(addr->sin6_addr));
             addr->sin6_port   = port;
             addr->sin6_family = AF_INET6;
-            info.ai_family    = AF_INET6;
-            info.ai_addrlen   = sizeof(struct sockaddr_in6);
-            info.ai_addr      = (struct sockaddr *)addr;
         }
     } else {
         if (!validate_hostname(host, name_len)) {
@@ -448,12 +440,28 @@ perform_handshake(EV_P_ server_t *server)
         }
         char tmp_port[16];
         snprintf(tmp_port, 16, "%d", ntohs(port));
-        memset(&storage, 0, sizeof(struct sockaddr_storage));
-        if (get_sockaddr(host, tmp_port, &storage, 0, 1) == -1) {
+        if (get_sockaddr(host, tmp_port, &storage, 0, ipv6first) == -1) {
             LOGE("failed to resolve the provided hostname");
             close_and_free_server(EV_A_ server);
             return;
         }
+    }
+
+    info.ai_socktype = SOCK_STREAM;
+    info.ai_protocol = IPPROTO_TCP;
+
+    if (storage.ss_family == AF_INET) {
+        info.ai_family   = AF_INET;
+        info.ai_addrlen  = sizeof(struct sockaddr_in);
+        info.ai_addr     = (struct sockaddr *)&storage;
+    } else if (storage.ss_family == AF_INET6) {
+        info.ai_family   = AF_INET6;
+        info.ai_addrlen  = sizeof(struct sockaddr_in6);
+        info.ai_addr     = (struct sockaddr *)&storage;
+    } else {
+        LOGE("failed to resolve the provided hostname");
+        close_and_free_server(EV_A_ server);
+        return;
     }
 
     if (verbose) {

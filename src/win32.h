@@ -72,5 +72,6 @@ void ss_error(const char *s);
 size_t strnlen(const char *s, size_t maxlen);
 int setnonblocking(int fd);
 const char *inet_ntop(int af, const void *src, char *dst, socklen_t size);
+int inet_pton(int af, const char *src, void *dst);
 
 #endif

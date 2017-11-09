@@ -90,7 +90,6 @@ setinterface(int socket_fd, const char *interface_name)
                          sizeof(struct ifreq));
     return res;
 }
-
 #endif
 
 int

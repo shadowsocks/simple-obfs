@@ -39,7 +39,6 @@
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <netinet/in.h>
-#include <pthread.h>
 #endif
 
 #if defined(HAVE_SYS_IOCTL_H) && defined(HAVE_NET_IF_H) && defined(__linux__)
@@ -133,8 +132,6 @@ setnonblocking(int fd)
     return fcntl(fd, F_SETFL, flags | O_NONBLOCK);
 }
 
-#endif
-
 static void
 parent_watcher_cb(EV_P_ ev_timer *watcher, int revents)
 {
@@ -150,6 +147,7 @@ parent_watcher_cb(EV_P_ ev_timer *watcher, int revents)
 
     ppid = cur_ppid;
 }
+#endif
 
 int
 create_and_bind(const char *addr, const char *port)
@@ -1213,7 +1211,9 @@ main(int argc, char **argv)
     ev_signal_start(EV_DEFAULT, &sigterm_watcher);
 
     ev_timer parent_watcher;
+#ifndef __MINGW32__
     ev_timer_init(&parent_watcher, parent_watcher_cb, 0, UPDATE_INTERVAL);
+#endif
     ev_timer_start(EV_DEFAULT, &parent_watcher);
 
     struct ev_loop *loop = EV_DEFAULT;

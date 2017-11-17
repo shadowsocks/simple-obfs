@@ -1,13 +1,13 @@
 # Contributor: Max Lv <max.c.lv@gmail.com>
 # Maintainer: Max Lv <max.c.lv@gmail.com>
 pkgname=simple-obfs
-pkgver=0.0.4
+pkgver=0.0.5
 pkgrel=0
 pkgdesc="Simple-obfs is a simple obfusacting tool, designed as plugin server of shadowsocks."
 url="https://github.com/shadowsocks/simple-obfs"
 arch="all"
 license="GPLv3+"
-makedepends="autoconf automake libtool linux-headers libev-dev c-ares-dev asciidoc xmlto"
+makedepends="autoconf automake libtool linux-headers libev-dev asciidoc xmlto"
 subpackages="$pkgname-doc"
 builddir="$srcdir/$pkgname"
 

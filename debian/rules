@@ -4,5 +4,12 @@
 # Security Hardening
 export DEB_BUILD_MAINT_OPTIONS = hardening=+all
 
+override_dh_auto_configure:
+	# Whether to have stack-protector is decided by dpkg-buildflags.
+	# So --disable-ssp here should be safe.
+	# See Bug in parent project: #829498
+	dh_auto_configure -- \
+		--disable-ssp
+
 %:
 	dh $@

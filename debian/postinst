@@ -22,6 +22,19 @@ case "$1" in
 	configure|reconfigure)
 		pathfind setcap && setcap \
 			cap_net_bind_service+ep /usr/bin/obfs-server
+		if [ ! -f /etc/shadowsocks-libev/config-obfs.json ]; then
+			set +e
+			pathfind apg
+			if [ $? -eq 0 ]; then
+				passwd=$(apg -n 1 -M ncl)
+			else
+				passwd=$(pwgen 12 1)
+			fi
+			set -e
+			mkdir -p /etc/shadowsocks-libev
+			sed "s/barfoo!/$passwd/" /usr/share/simple-obfs/config.json \
+				> /etc/shadowsocks-libev/config-obfs.json
+		fi
 		;;
 	abort-upgrade|abort-remove|abort-deconfigure)
 		exit 0

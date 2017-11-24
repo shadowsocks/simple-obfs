@@ -12,11 +12,6 @@ Files: debian/*
 Copyright: 2017 Roger Shimizu <rogershimizu@gmail.com>
 License: GPL-3+
 
-Files: m4/ax_pthread.m4
-Copyright: 2008 Steven G. Johnson <stevenj@alum.mit.edu>
-           2011 Daniel Richard G. <skunk@iSKUNK.ORG>
-License: GPL-3+ with Autoconf exception
-
 Files: m4/ax_tls.m4
 Copyright: 2008 Alan Woodland <ajw05@aber.ac.uk>
            2010 Diego Elio Petteno` <flameeyes@gmail.com>
@@ -34,9 +29,34 @@ Files: src/json.c src/json.h
 Copyright: 2012-2014 James McLaughlin et al.
 License: BSD-2-Clause
 
-Files: src/resolv.c src/resolv.h
-Copyright: 2014 Dustin Lundquist <dustin@null-ptr.net>
-License: BSD-2-Clause
+Files: m4/inet_ntop.m4
+Copyright: 2005-2013, Free Software Foundation, Inc
+License: FSFULLR
+ Copyright (C) 2005-2006, 2008-2013 Free Software Foundation, Inc.
+ This file is free software; the Free Software Foundation
+ gives unlimited permission to copy and/or distribute it,
+ with or without modifications, as long as this notice is preserved.
+
+Files: src/uthash.h
+Copyright: 2003-2016, Troy D. Hanson
+License: BSD-1-clause
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions are met:
+ .
+ * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+ .
+ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
+ IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
+ TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+ PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER
+ OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+ EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 License: Apache-2.0
  Licensed under the Apache License, Version 2.0 (the "License");
@@ -78,7 +98,7 @@ License: BSD-2-Clause
  OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  SUCH DAMAGE.
 
-License:   GPL-3+
+License: GPL-3+
  This file is part of the simple-obfs.
  .
  simple-obfs is free software; you can redistribute it and/or modify

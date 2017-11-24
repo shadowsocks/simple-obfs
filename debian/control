@@ -1,22 +1,29 @@
 Source: simple-obfs
 Section: net
-Priority: extra
+Priority: optional
 Maintainer: Roger Shimizu <rogershimizu@gmail.com>
 Build-Depends:
+ asciidoc-base | asciidoc,
  debhelper (>= 10),
- libcork-dev
-Standards-Version: 3.9.8
+ libcork-dev,
+ libev-dev,
+ xmlto
+Standards-Version: 4.1.1
 Homepage: https://github.com/shadowsocks/simple-obfs
+Vcs-Git: https://anonscm.debian.org/git/collab-maint/simple-obfs.git
+Vcs-Browser: https://anonscm.debian.org/cgit/collab-maint/simple-obfs.git
 
 Package: simple-obfs
 Architecture: any
 Multi-Arch: foreign
 Depends:
  libcap2-bin [linux-any],
+ shadowsocks-libev (>= 3.0.5),
  ${misc:Depends},
  ${shlibs:Depends}
-Description: simple obfusacting plugin for shadowsocks server
- Simple-obfs is a simple obfusacting tool, designed as plugin server
- of shadowsocks.
+Description: simple obfusacting plugin for shadowsocks-libev
+ Simple-obfs is a simple obfusacting tool, designed as plugin
+ server/client of shadowsocks-libev.
  .
- Please refer README.md and manpages for usage.
+ Simple-obfs is written in pure C and takes advantage of libev to
+ achieve both high performance and low resource consumption.

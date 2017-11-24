@@ -1,0 +1,9 @@
+Document: simple-obfs
+Title: simple-obfs documentation
+Author: Max Lv <max.c.lv@gmail.com>
+Abstract: This is the documentation of simple-obfs for shadowsocks
+Section: Network/Communication
+
+Format: HTML
+Index: /usr/share/doc/simple-obfs/obfs-server.html
+Files: /usr/share/doc/simple-obfs/*.html

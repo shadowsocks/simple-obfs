@@ -31,6 +31,7 @@
 
 #include <winsock2.h>
 #include <ws2tcpip.h>
+#include <time.h>
 
 #ifdef EWOULDBLOCK
 #undef EWOULDBLOCK
@@ -73,5 +74,6 @@ size_t strnlen(const char *s, size_t maxlen);
 int setnonblocking(int fd);
 const char *inet_ntop(int af, const void *src, char *dst, socklen_t size);
 int inet_pton(int af, const char *src, void *dst);
+int clock_gettime(clockid_t clock_id, struct timespec *tp);
 
 #endif

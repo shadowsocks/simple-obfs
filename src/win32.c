@@ -29,6 +29,16 @@
 #undef setsockopt
 #endif
 
+int
+clock_gettime(clockid_t id, struct timespec *spec)
+{
+    __int64 wintime; GetSystemTimeAsFileTime((FILETIME*)&wintime);
+    wintime      -= 116444736000000000LL;           //1jan1601 to 1jan1970
+    spec->tv_sec  = wintime / 10000000LL;           //seconds
+    spec->tv_nsec = wintime % 10000000LL * 100;     //nano-seconds
+    return 0;
+}
+
 void
 winsock_init(void)
 {

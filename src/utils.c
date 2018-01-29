@@ -273,6 +273,8 @@ usage()
 #ifndef MODULE_REMOTE
     printf(
         "       --obfs-host <host_name>    Hostname for obfuscating (Experimental).\n");
+    printf(
+        "       --obfs-uri <uri_path>      HTTP path uri for obfuscating (Experimental).\n");
 #endif
     printf("\n");
     printf(

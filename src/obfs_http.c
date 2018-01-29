@@ -32,7 +32,7 @@
 #include "obfs_http.h"
 
 static const char *http_request_template =
-    "GET / HTTP/1.1\r\n"
+    "GET %s HTTP/1.1\r\n"
     "Host: %s\r\n"
     "User-Agent: curl/7.%d.%d\r\n"
     "Upgrade: websocket\r\n"
@@ -104,7 +104,7 @@ obfs_http_request(buffer_t *buf, size_t cap, obfs_t *obfs)
 
     size_t obfs_len =
         snprintf(http_header, sizeof(http_header), http_request_template,
-                 host_port, major_version, minor_version, b64, buf->len);
+                 obfs_http->uri, host_port, major_version, minor_version, b64, buf->len);
     size_t buf_len = buf->len;
 
     brealloc(buf, obfs_len + buf_len, cap);

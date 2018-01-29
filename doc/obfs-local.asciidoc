@@ -85,6 +85,9 @@ Enable HTTP or TLS obfuscating. (Experimental)
 --obfs-host <hostname>::
 Specify the hostname for obfuscating. (Experimental)
 
+--obfs-uri <uri>::
+Specify the HTTP path uri for obfuscating. (Experimental)
+
 -v::
 Enable verbose mode.
 

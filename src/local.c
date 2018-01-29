@@ -878,7 +878,8 @@ main(int argc, char **argv)
     char *pid_path   = NULL;
     char *conf_path  = NULL;
     char *iface      = NULL;
-    char *obfs_host   = NULL;
+    char *obfs_host  = NULL;
+    char *obfs_uri   = NULL;
 
     srand(time(NULL));
 
@@ -962,6 +963,8 @@ main(int argc, char **argv)
                         obfs_para = obfs_tls;
                 } else if (strcmp(key, "obfs-host") == 0) {
                     obfs_host = value;
+                } else if (strcmp(key, "obfs-uri") == 0) {
+                    obfs_uri = value;
 #ifdef __linux__
                 } else if (strcmp(key, "mptcp") == 0) {
                     mptcp = 1;
@@ -979,6 +982,7 @@ main(int argc, char **argv)
         { "mptcp",     no_argument,       0, 0 },
         { "obfs",      required_argument, 0, 0 },
         { "obfs-host", required_argument, 0, 0 },
+        { "obfs-uri",  required_argument, 0, 0 },
         { "help",      no_argument,       0, 0 },
         { 0,           0,                 0, 0 }
     };
@@ -1009,6 +1013,8 @@ main(int argc, char **argv)
             } else if (option_index == 3) {
                 obfs_host = optarg;
             } else if (option_index == 4) {
+                obfs_uri = optarg;
+            } else if (option_index == 5) {
                 usage();
                 exit(EXIT_SUCCESS);
             }
@@ -1107,6 +1113,9 @@ main(int argc, char **argv)
         if (obfs_host == NULL) {
             obfs_host = conf->obfs_host;
         }
+        if (obfs_uri == NULL) {
+            obfs_uri = conf->obfs_uri;
+        }
         if (fast_open == 0) {
             fast_open = conf->fast_open;
         }
@@ -1173,10 +1182,13 @@ main(int argc, char **argv)
             obfs_para->host = obfs_host;
         else
             obfs_para->host = "cloudfront.net";
+        if (obfs_uri == NULL) obfs_para->uri = "/";
+        else obfs_para->uri = obfs_uri;
         obfs_para->port = atoi(remote_port);
         LOGI("obfuscating enabled");
         if (obfs_host)
             LOGI("obfuscating hostname: %s", obfs_host);
+        if (obfs_uri) LOGI("obfuscation uri path: %s", obfs_uri);
     }
 
 #ifdef __MINGW32__

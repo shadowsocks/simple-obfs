@@ -40,6 +40,7 @@ typedef struct obfs {
 typedef struct obfs_para {
     const char *name;
     const char *host;
+    const char *uri;
     uint16_t port;
     bool send_empty_response_upon_connection;
 

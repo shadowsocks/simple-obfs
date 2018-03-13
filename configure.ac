@@ -72,12 +72,6 @@ case $host in
     AC_MSG_RESULT(Linux)
     ;;
   *-mingw*)
-    dnl Add custom macros for libev
-    AC_DEFINE([FD_SETSIZE], [2048], [Reset max file descriptor size.])
-    AC_DEFINE([EV_FD_TO_WIN32_HANDLE(fd)], [(fd)], [Override libev default fd conversion macro.])
-    AC_DEFINE([EV_WIN32_HANDLE_TO_FD(handle)], [(handle)], [Override libev default handle conversion macro.])
-    AC_DEFINE([EV_WIN32_CLOSE_FD(fd)], [closesocket(fd)], [Override libev default fd close macro.])
-
     os_support=mingw
     AC_MSG_RESULT(MinGW)
     ;;
@@ -146,7 +140,7 @@ AC_CHECK_HEADERS([net/if.h], [], [],
 case $host in
   *-mingw*)
     AC_DEFINE([CONNECT_IN_PROGRESS], [WSAEWOULDBLOCK], [errno for incomplete non-blocking connect(2)])
-    AC_CHECK_HEADERS([windows.h winsock2.h ws2tcpip.h], [], [AC_MSG_ERROR([Missing MinGW headers])], [])
+    AC_CHECK_HEADERS([windows.h winsock2.h ws2tcpip.h mswsock.h], [], [AC_MSG_ERROR([Missing MinGW headers])], [])
     ;;
   *-linux*)
     AC_DEFINE([CONNECT_IN_PROGRESS], [EINPROGRESS], [errno for incomplete non-blocking connect(2)])
@@ -201,36 +195,17 @@ AC_FUNC_SELECT_ARGTYPES
 AC_TYPE_SIGNAL
 AC_CHECK_FUNCS([memset select setresuid setreuid strerror getpwnam_r setrlimit])
 
-dnl Check for select() into ws2_32 for Msys/Mingw
-if test "$ac_cv_func_select" != "yes"; then
-  AC_MSG_CHECKING([for select in ws2_32])
-  AC_TRY_LINK([
-#ifdef HAVE_WINSOCK2_H
-#ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN
-#endif
-#include <winsock2.h>
-#endif
-    ],[
-      select(0,(fd_set *)NULL,(fd_set *)NULL,(fd_set *)NULL,(struct timeval *)NULL);
-    ],[
-      AC_MSG_RESULT([yes])
-      HAVE_SELECT="1"
-      AC_DEFINE_UNQUOTED(HAVE_SELECT, 1,
-        [Define to 1 if you have the 'select' function.])
-      HAVE_SYS_SELECT_H="1"
-      AC_DEFINE_UNQUOTED(HAVE_SYS_SELECT_H, 1,
-        [Define to 1 if you have the <sys/select.h> header file.])
-    ],[
-      AC_MSG_ERROR([no])
-  ])
-fi
-
 AC_CHECK_LIB(socket, connect)
 
 dnl Checks for library functions.
 AC_CHECK_FUNCS([malloc memset socket])
 
+AC_ARG_WITH(ev,
+  AS_HELP_STRING([--with-ev=DIR], [use a specific libev library]),
+  [CFLAGS="$CFLAGS -I$withval/include"
+   CPPFLAGS="$CPPFLAGS -I$withval/include"
+   LDFLAGS="$LDFLAGS -L$withval/lib"]
+)
 AC_CHECK_LIB([ev], [ev_loop_destroy], [LIBS="-lev $LIBS"], [AC_MSG_ERROR([Couldn't find libev. Try installing libev-dev@<:@el@:>@.])])
 
 AM_COND_IF([ENABLE_DOCUMENTATION],

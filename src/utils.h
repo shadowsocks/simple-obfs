@@ -120,7 +120,7 @@ extern FILE *logfile;
         time_t now = time(NULL);                                            \
         char timestr[20];                                                   \
         strftime(timestr, 20, TIME_FORMAT, localtime(&now));                \
-        fprintf(stderr, "%s [simple-obfs] INFO: " format "\n", timestr, ## __VA_ARGS__); \
+        fprintf(stderr, " %s [simple-obfs] INFO: " format "\n", timestr, ## __VA_ARGS__); \
         fflush(stderr); }                                                   \
     while (0)
 
@@ -129,7 +129,7 @@ extern FILE *logfile;
         time_t now = time(NULL);                                             \
         char timestr[20];                                                    \
         strftime(timestr, 20, TIME_FORMAT, localtime(&now));                 \
-        fprintf(stderr, "%s [simple-obfs] ERROR: " format "\n", timestr, ## __VA_ARGS__); \
+        fprintf(stderr, " %s [simple-obfs] ERROR: " format "\n", timestr, ## __VA_ARGS__); \
         fflush(stderr); }                                                    \
     while (0)
 
@@ -202,6 +202,7 @@ extern int use_syslog;
 #undef ERROR
 #endif
 #define ERROR(s) ss_error(s)
+void ss_error(const char *s); // Implemented in win32.c
 
 #else
 

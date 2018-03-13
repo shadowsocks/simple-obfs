@@ -10,9 +10,7 @@ OBFS_COMMON_LIBS = $(top_builddir)/libcork/libcork.la \
 OBFS_COMMON_LIBS += -lev -lm
 
 bin_PROGRAMS = obfs-local
-if !BUILD_WINCOMPAT
 bin_PROGRAMS += obfs-server
-endif
 
 obfs_src = obfs_http.c \
 		   obfs_tls.c \
@@ -43,4 +41,5 @@ obfs_server_CFLAGS = $(AM_CFLAGS) -DMODULE_REMOTE
 
 if BUILD_WINCOMPAT
 obfs_local_SOURCES += win32.c
+obfs_server_SOURCES += win32.c
 endif

@@ -119,6 +119,7 @@ uint64_t rx                  = 0;
 
 static struct cork_dllist connections;
 
+#ifndef __MINGW32__
 static void
 parent_watcher_cb(EV_P_ ev_timer *watcher, int revents)
 {
@@ -133,6 +134,7 @@ parent_watcher_cb(EV_P_ ev_timer *watcher, int revents)
 
     ppid = cur_ppid;
 }
+#endif
 
 static void
 free_connections(struct ev_loop *loop)
@@ -152,7 +154,7 @@ setfastopen(int fd)
     int s = 0;
 #ifdef TCP_FASTOPEN
     if (fast_open) {
-#ifdef __APPLE__
+#if defined(__APPLE__) || defined(__MINGW32__)
         int opt = 1;
 #else
         int opt = 5;
@@ -348,6 +350,49 @@ connect_to_remote(EV_P_ struct addrinfo *res,
                          &iov, 1, &len, NULL);
         if (s == 0) {
             s = len;
+        }
+#elif defined(TCP_FASTOPEN_WINSOCK)
+        DWORD s = -1;
+        DWORD err = 0;
+        do {
+            int optval = 1;
+            // Set fast open option
+            if (setsockopt(sockfd, IPPROTO_TCP, TCP_FASTOPEN,
+                           &optval, sizeof(optval)) != 0) {
+                ERROR("setsockopt");
+                break;
+            }
+            // Load ConnectEx function
+            LPFN_CONNECTEX ConnectEx = winsock_getconnectex();
+            if (ConnectEx == NULL) {
+                LOGE("Cannot load ConnectEx() function");
+                err = WSAENOPROTOOPT;
+                break;
+            }
+            // ConnectEx requires a bound socket
+            if (winsock_dummybind(sockfd, res->ai_addr) != 0) {
+                ERROR("bind");
+                break;
+            }
+            // Call ConnectEx to send data
+            memset(&remote->olap, 0, sizeof(remote->olap));
+            remote->connect_ex_done = 0;
+            if (ConnectEx(sockfd, res->ai_addr, res->ai_addrlen,
+                          server->buf->data, server->buf->len,
+                          &s, &remote->olap)) {
+                remote->connect_ex_done = 1;
+                break;
+            };
+            // XXX: ConnectEx pending, check later in remote_send
+            if (WSAGetLastError() == ERROR_IO_PENDING) {
+                err = CONNECT_IN_PROGRESS;
+                break;
+            }
+            ERROR("ConnectEx");
+        } while(0);
+        // Set error number
+        if (err) {
+            SetLastError(err);
         }
 #else
         ssize_t s = sendto(sockfd, server->buf->data + server->buf->idx,
@@ -809,6 +854,37 @@ remote_send_cb(EV_P_ ev_io *w, int revents)
     }
 
     if (!remote_send_ctx->connected) {
+#ifdef TCP_FASTOPEN_WINSOCK
+        if (fast_open) {
+            // Check if ConnectEx is done
+            if (!remote->connect_ex_done) {
+                DWORD numBytes;
+                DWORD flags;
+                // Non-blocking way to fetch ConnectEx result
+                if (WSAGetOverlappedResult(remote->fd, &remote->olap,
+                                           &numBytes, FALSE, &flags)) {
+                    remote->buf->len -= numBytes;
+                    remote->buf->idx  = numBytes;
+                    remote->connect_ex_done = 1;
+                } else if (WSAGetLastError() == WSA_IO_INCOMPLETE) {
+                    // XXX: ConnectEx still not connected, wait for next time
+                    return;
+                } else {
+                    ERROR("WSAGetOverlappedResult");
+                    // not connected
+                    close_and_free_remote(EV_A_ remote);
+                    close_and_free_server(EV_A_ server);
+                    return;
+                };
+            }
+
+            // Make getpeername work
+            if (setsockopt(remote->fd, SOL_SOCKET,
+                           SO_UPDATE_CONNECT_CONTEXT, NULL, 0) != 0) {
+                ERROR("setsockopt");
+            }
+        }
+#endif
         struct sockaddr_storage addr;
         socklen_t len = sizeof(struct sockaddr_storage);
         memset(&addr, 0, len);
@@ -1478,9 +1554,11 @@ main(int argc, char **argv)
     // Init connections
     cork_dllist_init(&connections);
 
+#ifndef __MINGW32__
     ev_timer parent_watcher;
     ev_timer_init(&parent_watcher, parent_watcher_cb, 0, UPDATE_INTERVAL);
     ev_timer_start(EV_DEFAULT, &parent_watcher);
+#endif
 
     // start ev loop
     ev_run(loop, 0);

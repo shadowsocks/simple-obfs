@@ -26,6 +26,10 @@
 #include <ev.h>
 #include <libcork/ds.h>
 
+#ifdef __MINGW32__
+#include "win32.h"
+#endif
+
 #include "encrypt.h"
 #include "jconf.h"
 
@@ -77,6 +81,10 @@ typedef struct remote {
     int direct;
     int addr_len;
     uint32_t counter;
+#ifdef TCP_FASTOPEN_WINSOCK
+    OVERLAPPED olap;
+    int connect_ex_done;
+#endif
 
     buffer_t *buf;
     struct remote_ctx *recv_ctx;

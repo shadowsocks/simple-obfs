@@ -1,7 +1,7 @@
 /*
- * win32.h - Win32 port helpers
+ * win32.h - Windows socket compatibility layer
  *
- * Copyright (C) 2014, Linus Yang <linusyang@gmail.com>
+ * Copyright (C) 2013 - 2018, Max Lv <max.c.lv@gmail.com>
  *
  * This file is part of the simple-obfs.
  *
@@ -20,60 +20,93 @@
  * <http://www.gnu.org/licenses/>.
  */
 
-#ifndef _WIN32_H
-#define _WIN32_H
+#ifndef _WINSOCK_H
+#define _WINSOCK_H
 
-#ifdef _WIN32_WINNT
+#ifdef __MINGW32__
+
+// Target NT6
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif
+
+#if defined(_WIN32_WINNT) && _WIN32_WINNT < 0x0600
 #undef _WIN32_WINNT
 #endif
 
-#define _WIN32_WINNT 0x0501
+#ifndef _WIN32_WINNT
+#define _WIN32_WINNT 0x0600
+#endif
 
+// Winsock headers
+#include <windows.h>
 #include <winsock2.h>
 #include <ws2tcpip.h>
-#include <time.h>
+#include <mswsock.h>
+
+// Override POSIX error number
+#ifdef errno
+#undef errno
+#endif
+#define errno WSAGetLastError()
 
 #ifdef EWOULDBLOCK
 #undef EWOULDBLOCK
 #endif
+#define EWOULDBLOCK WSAEWOULDBLOCK
 
-#ifdef errno
-#undef errno
+#ifdef CONNECT_IN_PROGRESS
+#undef CONNECT_IN_PROGRESS
+#endif
+#define CONNECT_IN_PROGRESS WSAEWOULDBLOCK
+
+#ifdef EOPNOTSUPP
+#undef EOPNOTSUPP
+#endif
+#define EOPNOTSUPP WSAEOPNOTSUPP
+
+#ifdef EPROTONOSUPPORT
+#undef EPROTONOSUPPORT
+#endif
+#define EPROTONOSUPPORT WSAEPROTONOSUPPORT
+
+#ifdef ENOPROTOOPT
+#undef ENOPROTOOPT
+#endif
+#define ENOPROTOOPT WSAENOPROTOOPT
+
+// Check if ConnectEx supported in header
+#ifdef WSAID_CONNECTEX
+// Hardcode TCP fast open option
+#ifndef TCP_FASTOPEN
+#define TCP_FASTOPEN 15
+#endif
+// Enable TFO support
+#define TCP_FASTOPEN_WINSOCK 1
 #endif
 
+// Override close function
+#define close(fd) closesocket(fd)
+
+// Override MinGW functions
+#define setsockopt(a,b,c,d,e) setsockopt(a,b,c,(const char *)(d),e)
+#define inet_ntop(a,b,c,d) inet_ntop(a,(void *)(b),c,d)
+
+// Override Windows built-in functions
 #ifdef ERROR
 #undef ERROR
 #endif
-
-#ifndef AI_ALL
-#define AI_ALL 0x00000100
-#endif
-
-#ifndef AI_ADDRCONFIG
-#define AI_ADDRCONFIG 0x00000400
-#endif
-
-#ifndef AI_V4MAPPED
-#define AI_V4MAPPED 0x00000800
-#endif
-
-#ifndef IPV6_V6ONLY
-#define IPV6_V6ONLY 27 // Treat wildcard bind as AF_INET6-only.
-#endif
-
-#define EWOULDBLOCK WSAEWOULDBLOCK
-#define errno WSAGetLastError()
-#define close(fd) closesocket(fd)
 #define ERROR(s) ss_error(s)
-#define setsockopt(a, b, c, d, e) setsockopt(a, b, c, (char *)(d), e)
 
+// Winsock compatibility functions
+int setnonblocking(SOCKET socket);
 void winsock_init(void);
 void winsock_cleanup(void);
-void ss_error(const char *s);
-size_t strnlen(const char *s, size_t maxlen);
-int setnonblocking(int fd);
-const char *inet_ntop(int af, const void *src, char *dst, socklen_t size);
-int inet_pton(int af, const char *src, void *dst);
-int clock_gettime(clockid_t clock_id, struct timespec *tp);
-
+#ifdef TCP_FASTOPEN_WINSOCK
+LPFN_CONNECTEX winsock_getconnectex(void);
+int winsock_dummybind(SOCKET fd, struct sockaddr *sa);
 #endif
+
+#endif // __MINGW32__
+
+#endif // _WINSOCK_H

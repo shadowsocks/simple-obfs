@@ -27,6 +27,10 @@
 #include <time.h>
 #include <libcork/ds.h>
 
+#ifdef __MINGW32__
+#include "win32.h"
+#endif
+
 #include "encrypt.h"
 #include "jconf.h"
 
@@ -76,6 +80,10 @@ typedef struct remote_ctx {
 
 typedef struct remote {
     int fd;
+#ifdef TCP_FASTOPEN_WINSOCK
+    OVERLAPPED olap;
+    int connect_ex_done;
+#endif
     buffer_t *buf;
     struct remote_ctx *recv_ctx;
     struct remote_ctx *send_ctx;

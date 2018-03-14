@@ -23,6 +23,10 @@
 #ifndef _NETUTILS_H
 #define _NETUTILS_H
 
+#ifdef __MINGW32__
+#include "win32.h"
+#endif
+
 #if defined(__linux__)
 #include <netdb.h>
 #elif !defined(__MINGW32__)
@@ -39,10 +43,6 @@
 /*  conditional define for MSG_FASTOPEN */
 #ifndef MSG_FASTOPEN
 #define MSG_FASTOPEN   0x20000000
-#endif
-#elif !defined(__APPLE__)
-#ifdef TCP_FASTOPEN
-#undef TCP_FASTOPEN
 #endif
 #endif
 

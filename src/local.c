@@ -423,7 +423,7 @@ server_recv_cb(EV_P_ ev_io *w, int revents)
                         // Just connected
                         remote->buf->idx = 0;
                         remote->buf->len = 0;
-#ifdef __APPLE__
+#if defined(__APPLE__) || defined(__MINGW32__)
                         ev_io_stop(EV_A_ & server_recv_ctx->io);
                         ev_io_start(EV_A_ & remote->send_ctx->io);
                         ev_timer_start(EV_A_ & remote->send_ctx->watcher);

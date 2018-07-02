@@ -946,6 +946,7 @@ main(int argc, char **argv)
     char *iface      = NULL;
     char *obfs_host  = NULL;
     char *obfs_uri   = NULL;
+    char *http_method= NULL;
 
     srand(time(NULL));
 
@@ -1031,6 +1032,8 @@ main(int argc, char **argv)
                     obfs_host = value;
                 } else if (strcmp(key, "obfs-uri") == 0) {
                     obfs_uri = value;
+                } else if (strcmp(key, "http-method") == 0) {
+                    http_method = value;
 #ifdef __linux__
                 } else if (strcmp(key, "mptcp") == 0) {
                     mptcp = 1;
@@ -1049,6 +1052,7 @@ main(int argc, char **argv)
         { "obfs",      required_argument, 0, 0 },
         { "obfs-host", required_argument, 0, 0 },
         { "obfs-uri",  required_argument, 0, 0 },
+        { "http-method",required_argument,0, 0 },
         { "help",      no_argument,       0, 0 },
         { 0,           0,                 0, 0 }
     };
@@ -1081,6 +1085,8 @@ main(int argc, char **argv)
             } else if (option_index == 4) {
                 obfs_uri = optarg;
             } else if (option_index == 5) {
+                http_method = optarg;
+            } else if (option_index == 6) {
                 usage();
                 exit(EXIT_SUCCESS);
             }
@@ -1182,6 +1188,9 @@ main(int argc, char **argv)
         if (obfs_uri == NULL) {
             obfs_uri = conf->obfs_uri;
         }
+        if (http_method == NULL) {
+            http_method = conf->http_method;
+        }
         if (fast_open == 0) {
             fast_open = conf->fast_open;
         }
@@ -1250,8 +1259,11 @@ main(int argc, char **argv)
             obfs_para->host = "cloudfront.net";
         if (obfs_uri == NULL) obfs_para->uri = "/";
         else obfs_para->uri = obfs_uri;
+        if (http_method == NULL) obfs_para->method = "GET";
+        else obfs_para->method = http_method;
         obfs_para->port = atoi(remote_port);
         LOGI("obfuscating enabled");
+        LOGI("obfuscation http method: %s", obfs_para->method);
         if (obfs_host)
             LOGI("obfuscating hostname: %s", obfs_host);
         if (obfs_uri) LOGI("obfuscation uri path: %s", obfs_uri);

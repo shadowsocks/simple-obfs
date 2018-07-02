@@ -32,7 +32,7 @@
 #include "obfs_http.h"
 
 static const char *http_request_template =
-    "GET %s HTTP/1.1\r\n"
+    "%s %s HTTP/1.1\r\n"
     "Host: %s\r\n"
     "User-Agent: curl/7.%d.%d\r\n"
     "Upgrade: websocket\r\n"
@@ -103,7 +103,7 @@ obfs_http_request(buffer_t *buf, size_t cap, obfs_t *obfs)
     base64_encode(b64, 64, key, 16);
 
     size_t obfs_len =
-        snprintf(http_header, sizeof(http_header), http_request_template,
+        snprintf(http_header, sizeof(http_header), http_request_template, obfs_http->method,
                  obfs_http->uri, host_port, major_version, minor_version, b64, buf->len);
     size_t buf_len = buf->len;
 
@@ -198,8 +198,8 @@ check_http_header(buffer_t *buf)
 
     if (len < 4)
         return OBFS_NEED_MORE;
-
-    if (strncasecmp(data, "GET", 3) != 0)
+    int method_len = sizeof(obfs_http->method);
+    if (strncasecmp(data, obfs_http->method, method_len) != 0)
         return OBFS_ERROR;
 
     {

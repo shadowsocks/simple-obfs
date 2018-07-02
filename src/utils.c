@@ -272,6 +272,8 @@ usage()
         "       --obfs <http|tls>          Enable obfuscating: HTTP or TLS (Experimental).\n");
 #ifndef MODULE_REMOTE
     printf(
+        "       --http-method <METHOD>     HTTP request method for obfuscating (Experimental).\n");
+    printf(
         "       --obfs-host <host_name>    Hostname for obfuscating (Experimental).\n");
     printf(
         "       --obfs-uri <uri_path>      HTTP path uri for obfuscating (Experimental).\n");

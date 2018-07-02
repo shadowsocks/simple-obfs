@@ -270,9 +270,9 @@ usage()
 #endif
     printf(
         "       --obfs <http|tls>          Enable obfuscating: HTTP or TLS (Experimental).\n");
-#ifndef MODULE_REMOTE
     printf(
         "       --http-method <METHOD>     HTTP request method for obfuscating (Experimental).\n");
+#ifndef MODULE_REMOTE
     printf(
         "       --obfs-host <host_name>    Hostname for obfuscating (Experimental).\n");
     printf(

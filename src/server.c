@@ -1167,6 +1167,7 @@ main(int argc, char **argv)
     ss_addr_t failover = { .host = NULL, .port = NULL };
     char *failover_str = NULL;
     char *obfs_host = NULL;
+    char *http_method = NULL;
 
     char *ss_remote_host = getenv("SS_REMOTE_HOST");
     char *ss_remote_port = getenv("SS_REMOTE_PORT");
@@ -1241,6 +1242,8 @@ main(int argc, char **argv)
                         obfs_para = obfs_tls;
                 } else if (strcmp(key, "obfs-host") == 0) {
                     obfs_host = value;
+                } else if (strcmp(key, "http-method") == 0) {
+                    http_method = value;
                 } else if (strcmp(key, "failover") == 0) {
                     failover_str = value;
                 } else if (strcmp(key, "reverse_proxy") == 0) {
@@ -1261,6 +1264,7 @@ main(int argc, char **argv)
         { "help",            no_argument,       0, 0 },
         { "obfs",            required_argument, 0, 0 },
         { "obfs-host",       required_argument, 0, 0 },
+        { "http-method",     required_argument, 0, 0 },
         { "failover",        required_argument, 0, 0 },
 #ifdef __linux__
         { "mptcp",           no_argument,       0, 0 },
@@ -1290,11 +1294,13 @@ main(int argc, char **argv)
             } else if (option_index == 3) {
                 obfs_host = optarg;
             } else if (option_index == 4) {
-                failover_str = optarg;
+                http_method = optarg;
             } else if (option_index == 5) {
+                failover_str = optarg;
+            } else if (option_index == 6) {
                 mptcp = 1;
                 LOGI("enable multipath TCP");
-            } else if (option_index == 6) {
+            } else if (option_index == 7) {
                 reverse_proxy = 1;
                 LOGI("enable reverse proxy");
             }
@@ -1390,6 +1396,7 @@ main(int argc, char **argv)
         if (obfs_host == NULL) {
             obfs_host = conf->obfs_host;
         }
+        if (http_method == NULL) http_method = conf->http_method;
         if (mptcp == 0) {
             mptcp = conf->mptcp;
         }
@@ -1474,7 +1481,10 @@ main(int argc, char **argv)
 
     if (obfs_para) {
         obfs_para->host = obfs_host;
+        if (http_method == NULL) obfs_para->method = "GET";
+        else obfs_para->method = http_method;
         LOGI("obfuscating enabled");
+        LOGI("obfuscation http method: %s", obfs_para->method);
         if (obfs_host)
             LOGI("obfuscating hostname: %s", obfs_host);
     }

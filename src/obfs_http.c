@@ -198,7 +198,7 @@ check_http_header(buffer_t *buf)
 
     if (len < 4)
         return OBFS_NEED_MORE;
-    if (strncasecmp(data, obfs_http->method, strlen(obfs_http->method)) != 0)
+    if ( obfs_http->method != NULL && strncasecmp(data, obfs_http->method, strlen(obfs_http->method)) != 0)
         return OBFS_ERROR;
 
     {

@@ -1481,10 +1481,9 @@ main(int argc, char **argv)
 
     if (obfs_para) {
         obfs_para->host = obfs_host;
-        if (http_method == NULL) obfs_para->method = "GET";
-        else obfs_para->method = http_method;
+        obfs_para->method = http_method;
         LOGI("obfuscating enabled");
-        LOGI("obfuscation http method: %s", obfs_para->method);
+        if (http_method) LOGI("obfuscation http method: %s", obfs_para->method);
         if (obfs_host)
             LOGI("obfuscating hostname: %s", obfs_host);
     }

@@ -196,9 +196,11 @@ check_http_header(buffer_t *buf)
     char *data = buf->data;
     int len    = buf->len;
 
-    if (len < 4)
-        return OBFS_NEED_MORE;
-    if (strncasecmp(data, obfs_http->method, strlen(obfs_http->method)) != 0)
+    char *lfpos= strchr(data, '\n');
+    if (lfpos == NULL) return OBFS_NEED_MORE;
+    if (len < 15) return OBFS_ERROR;
+    if (strncasecmp(lfpos - 9, "HTTP/1.1", 8) != 0) return OBFS_ERROR;
+    if ( obfs_http->method != NULL && strncasecmp(data, obfs_http->method, strlen(obfs_http->method)) != 0)
         return OBFS_ERROR;
 
     {

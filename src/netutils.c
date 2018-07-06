@@ -85,7 +85,8 @@ setinterface(int socket_fd, const char *interface_name)
 {
     struct ifreq interface;
     memset(&interface, 0, sizeof(struct ifreq));
-    strncpy(interface.ifr_name, interface_name, IFNAMSIZ);
+    strncpy(interface.ifr_name, interface_name, IFNAMSIZ - 1);
+    interface.ifr_name[IFNAMSIZ - 1] = '\0';
     int res = setsockopt(socket_fd, SOL_SOCKET, SO_BINDTODEVICE, &interface,
                          sizeof(struct ifreq));
     return res;

@@ -54,5 +54,9 @@ int send_traffic_stat(uint64_t tx, uint64_t rx);
 #define STAGE_PARSE      2  /* Parse the header                 */
 #define STAGE_RESOLVE    4  /* Resolve the hostname             */
 #define STAGE_STREAM     5  /* Stream between client and server */
-
+#ifdef __MINGW32__
+#define SOCK_FD(fd) _open_osfhandle(fd, 0)
+#else
+#define SOCK_FD(fd) (fd)
+#endif
 #endif // _COMMON_H

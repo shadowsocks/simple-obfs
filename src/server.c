@@ -980,8 +980,8 @@ new_remote(int fd)
     remote->send_ctx->connected = 0;
     remote->server              = NULL;
 
-    ev_io_init(&remote->recv_ctx->io, remote_recv_cb, fd, EV_READ);
-    ev_io_init(&remote->send_ctx->io, remote_send_cb, fd, EV_WRITE);
+    ev_io_init(&remote->recv_ctx->io, remote_recv_cb, SOCK_FD(fd), EV_READ);
+    ev_io_init(&remote->send_ctx->io, remote_send_cb, SOCK_FD(fd), EV_WRITE);
 
     return remote;
 }
@@ -1053,8 +1053,8 @@ new_server(int fd, listen_ctx_t *listener)
     int request_timeout = min(MAX_REQUEST_TIMEOUT, listener->timeout)
                           + rand() % MAX_REQUEST_TIMEOUT;
 
-    ev_io_init(&server->recv_ctx->io, server_recv_cb, fd, EV_READ);
-    ev_io_init(&server->send_ctx->io, server_send_cb, fd, EV_WRITE);
+    ev_io_init(&server->recv_ctx->io, server_recv_cb, SOCK_FD(fd), EV_READ);
+    ev_io_init(&server->send_ctx->io, server_send_cb, SOCK_FD(fd), EV_WRITE);
     ev_timer_init(&server->recv_ctx->watcher, server_timeout_cb,
                   request_timeout, listener->timeout);
 
@@ -1540,7 +1540,7 @@ main(int argc, char **argv)
         listen_ctx->dst_addr = &dst_addr;
         listen_ctx->failover = &failover;
 
-        ev_io_init(&listen_ctx->io, accept_cb, listenfd, EV_READ);
+        ev_io_init(&listen_ctx->io, accept_cb, SOCK_FD(listenfd), EV_READ);
         ev_io_start(loop, &listen_ctx->io);
 
         if (host && strcmp(host, ":") > 0)

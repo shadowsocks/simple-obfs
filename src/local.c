@@ -738,8 +738,8 @@ new_remote(int fd, int timeout)
     remote->recv_ctx->remote    = remote;
     remote->send_ctx->remote    = remote;
 
-    ev_io_init(&remote->recv_ctx->io, remote_recv_cb, fd, EV_READ);
-    ev_io_init(&remote->send_ctx->io, remote_send_cb, fd, EV_WRITE);
+    ev_io_init(&remote->recv_ctx->io, remote_recv_cb, SOCK_FD(fd), EV_READ);
+    ev_io_init(&remote->send_ctx->io, remote_send_cb, SOCK_FD(fd), EV_WRITE);
     ev_timer_init(&remote->send_ctx->watcher, remote_timeout_cb,
                   min(MAX_CONNECT_TIMEOUT, timeout), 0);
     ev_timer_init(&remote->recv_ctx->watcher, remote_timeout_cb,
@@ -802,8 +802,8 @@ new_server(int fd)
         memset(server->obfs, 0, sizeof(obfs_t));
     }
 
-    ev_io_init(&server->recv_ctx->io, server_recv_cb, fd, EV_READ);
-    ev_io_init(&server->send_ctx->io, server_send_cb, fd, EV_WRITE);
+    ev_io_init(&server->recv_ctx->io, server_recv_cb, SOCK_FD(fd), EV_READ);
+    ev_io_init(&server->send_ctx->io, server_send_cb, SOCK_FD(fd), EV_WRITE);
 
     cork_dllist_add(&connections, &server->entries);
 
@@ -1330,7 +1330,7 @@ main(int argc, char **argv)
 
     listen_ctx.fd = listenfd;
 
-    ev_io_init(&listen_ctx.io, accept_cb, listenfd, EV_READ);
+    ev_io_init(&listen_ctx.io, accept_cb, SOCK_FD(listenfd), EV_READ);
     ev_io_start(loop, &listen_ctx.io);
 
 #ifdef HAVE_LAUNCHD

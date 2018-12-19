@@ -1,0 +1,104 @@
+%global requires   pcre shadowsocks-libev >= 3.0.5 libev
+%global conflicts python-shadowsocks python3-shadowsocks
+%if 0%{?fedora} || 0%{?rhel}
+%global requires   %{?requires} libcap
+%endif
+%if 0%{?suse_version}
+%global requires   %{?requires} libcap-progs
+%endif
+%global project_desc shadowsocks-simple-obfs is a simple obfusacting tool, designed as plugin server of shadowsocks.
+
+%if 0%{?fedora} >= 15 || 0%{?rhel} >=7 || 0%{?suse_version} >= 1210
+%global use_systemd 1
+%else
+%global use_systemd 0
+%endif
+
+Name:		    @NAME@
+Version:	    @VERSION@
+Release:	    @RELEASE@%{?dist}
+Summary:	    A simple obfusacting tool, designed as plugin server of shadowsocks
+
+Group:		    Applications/Internet
+License:	    GPLv3+
+URL:		    https://github.com/shadowsocks/simple-obfs
+Source0:	    @SOURCE@
+
+BuildRequires:	make gcc pcre-devel asciidoc xmlto automake libtool mbedtls-devel libsodium-devel >= 1.0.4 libev-devel c-ares-devel
+
+AutoReq:        no
+Conflicts:	    %{?conflicts}
+Requires:       %{?requires}
+
+%if 0%{?use_systemd}
+%{?systemd_requires}
+%if 0%{?suse_version}
+BuildRequires:   systemd-rpm-macros
+%else
+BuildRequires:   systemd
+%endif
+%endif
+
+%description
+%{?project_desc}
+
+%prep
+%setup -q -n @NAME_VERSION@
+
+%build
+./autogen.sh
+
+%if 0%{?use_system_lib}
+%configure --enable-shared --enable-system-shared-lib
+%else
+%configure --enable-shared
+%endif
+make %{?_smp_mflags}
+
+
+%install
+make install DESTDIR=%{buildroot}
+mkdir -p %{buildroot}/etc/shadowsocks-libev
+install -m 644 %{_builddir}/%{buildsubdir}/debian/config.json %{buildroot}%{_sysconfdir}/shadowsocks-libev/simple-obfs.json
+
+%pre
+
+
+%post
+setcap cap_net_bind_service+ep %{_bindir}/obfs-server \
+       cap_net_bind_service+ep %{_bindir}/obfs-local
+
+
+%preun
+%if ! 0%{?use_systemd}
+if [ $1 -eq 0 ]; then
+    /sbin/service shadowsocks-libev stop  > /dev/null 2>&1 || :
+fi
+%else
+%if 0%{?suse_version}
+%service_del_preun shadowsocks-libev.service
+%service_del_preun shadowsocks-libev-local.service
+%else
+%systemd_preun shadowsocks-libev.service
+%systemd_preun shadowsocks-libev-local.service
+if [ $1 -eq 0 ] ; then
+    # Package removal, not upgrade
+    systemctl stop shadowsocks-libev-server@'*'.service  > /dev/null 2>&1 || :
+    systemctl stop shadowsocks-libev-local@'*'.service  > /dev/null 2>&1 || :
+    systemctl stop shadowsocks-libev-tunnel@'*'.service  > /dev/null 2>&1 || :
+    systemctl stop shadowsocks-libev-redir@'*'.service  > /dev/null 2>&1 || :
+fi
+%endif
+%endif
+
+%postun
+echo "Update your shadowsocks-libev configure file, and restart it maunally."
+
+%files
+%doc %{_docdir}/simple-obfs/*.html
+%{_bindir}/*
+%config(noreplace) %{_sysconfdir}/shadowsocks-libev/simple-obfs.json
+%doc %{_mandir}/man*/*
+
+
+%changelog

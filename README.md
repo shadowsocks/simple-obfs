@@ -4,7 +4,7 @@ Deprecated. Followed by [v2ray-plugin](https://github.com/shadowsocks/v2ray-plug
 
 ## Intro
 
-Simple-obfs is a simple obfusacting tool, designed as plugin server of shadowsocks.
+Simple-obfs is a simple obfuscating tool, designed as plugin server of shadowsocks.
 
 Current version: 0.0.5 | [Changelog](Changes)
 

@@ -92,7 +92,7 @@ int
 ss_isnumeric(const char *s) {
     if (!s || !*s)
         return 0;
-    while (isdigit(*s))
+    while (isdigit((int)*s))
         ++s;
     return *s == '\0';
 }

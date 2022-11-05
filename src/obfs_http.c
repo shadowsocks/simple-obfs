@@ -244,9 +244,10 @@ check_http_header(buffer_t *buf)
                 break;
             }
 
-        result = OBFS_ERROR;
         if (strncasecmp(hostname, obfs_http->host, len) == 0) {
             result = OBFS_OK;
+        } else {
+            result = OBFS_ERROR;
         }
         free(hostname);
         return result;
